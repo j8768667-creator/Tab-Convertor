@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-<title>ChordScan Studio v1.7</title>
+<title>ChordScan Studio v1.8</title>
 <style>
 :root{--bg:#f6f2e9;--card:#fff;--ink:#17231c;--muted:#687269;--line:#d9d0c2;--green:#2f4f3e;--sage:#7a8f7b;--cream:#f4f1ea;--danger:#9d3b35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none;-webkit-overflow-scrolling:auto}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none;-webkit-user-select:none;user-select:none}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none;z-index:10}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;cursor:pointer;transition:all .15s}.diagramCard:active{transform:scale(.97)}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none;cursor:pointer}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px;transition:background .1s}.cell.marker:active{background:#ddd}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px;scroll-snap-type:x mandatory}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;flex-shrink:0;scroll-snap-align:start}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}#progressBar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0;display:none}#progressFill{height:100%;width:0%;background:var(--sage);transition:width .15s ease}#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#17231c;color:#fff;padding:8px 16px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}#toast.show{opacity:1}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
 </style>
 </head>
 <body>
-<header><h1>ChordScan Studio v1.7</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
+<header><h1>ChordScan Studio v1.8</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
 <div class="wrap">
   <div class="tabbar">
     <button class="active" data-pane="scan">1. Scan</button>
@@ -94,7 +94,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ================================================================
-// ChordScan Studio v1.7 — Auto-Grid Slicer & Robust Fret Recognition
+// ChordScan Studio v1.8 — Auto-Grid Slicer & Robust Fret Recognition
 // ================================================================
 
 var $ = function(id) { return document.getElementById(id); };
@@ -746,15 +746,43 @@ $('exportRiffle').onclick=async function(){try{var f=$('riffleTemplate').files[0
 
 // ---- Six-line guitar TAB OCR / parser ----
 function normaliseTabText(txt){
-  return String(txt||'').replace(/[│┃]/g,'|').replace(/[–—−]/g,'-').replace(/\r/g,'');
+  return String(txt||'')
+    .replace(/[│┃¦]/g,'|')
+    .replace(/[–—−_~]/g,'-')
+    .replace(/[Oo]/g,'0')
+    .replace(/\r/g,'');
+}
+function cleanTabCandidate(line){
+  line=normaliseTabText(line).trim();
+  if(!line)return '';
+  // Remove common OCR clutter while retaining TAB techniques.
+  line=line.replace(/[^eEBGDA0-9|\-hHpP\\/\s]/g,'');
+  line=line.replace(/\s+/g,'');
+  // Keep content from the first likely TAB separator/dash onward.
+  var m=line.match(/^([eEBGDA])?[|\-](.*)$/);
+  if(m)return (m[1]||'')+'|'+m[2].replace(/^\|+/,'');
+  // Salvage rows where OCR lost both label and first separator.
+  if((line.match(/-/g)||[]).length>=5 && /\d/.test(line))return '|'+line;
+  return '';
 }
 function extractTabGroups(txt){
-  var lines=normaliseTabText(txt).split('\n').map(function(x){return x.trimEnd();});
-  var groups=[], cur=[];
-  function isTabLine(line){return /^\s*[eEBGDA]\s*\|/.test(line)||/^\s*[eEBGDA]\s*[-|]/.test(line);}
-  for(var i=0;i<lines.length;i++){
-    if(isTabLine(lines[i])){cur.push(lines[i]);if(cur.length===6){groups.push(cur);cur=[];}}
-    else if(cur.length){cur=[];}
+  var raw=normaliseTabText(txt).split('\n');
+  var candidates=[];
+  raw.forEach(function(line){
+    var c=cleanTabCandidate(line);
+    if(!c)return;
+    var body=c.slice(c.indexOf('|')+1);
+    var dashCount=(body.match(/-/g)||[]).length;
+    var digitCount=(body.match(/\d/g)||[]).length;
+    if(dashCount>=5 && digitCount>=1)candidates.push(c);
+  });
+  var labels=['e','B','G','D','A','E'],groups=[];
+  for(var i=0;i+5<candidates.length;i+=6){
+    var block=candidates.slice(i,i+6).map(function(line,j){
+      var body=line.slice(line.indexOf('|')+1);
+      return labels[j]+'|'+body;
+    });
+    groups.push(block);
   }
   return groups;
 }
@@ -763,11 +791,12 @@ function parseTabText(txt){
   var openMidi={e:64,B:59,G:55,D:50,A:45,E:40};
   groups.forEach(function(g){
     var parsed=g.map(function(line){
-      var m=line.match(/^\s*([eEBGDA])\s*\|(.*)$/);if(!m)m=line.match(/^\s*([eEBGDA])\s*[-|](.*)$/);
+      var m=line.match(/^([eEBGDA])\|(.*)$/);
       return m?{label:m[1],body:m[2]}:null;
     });
     if(parsed.some(function(x){return !x;}))return;
     var width=Math.max.apply(null,parsed.map(function(x){return x.body.length;}));
+    parsed.forEach(function(x){x.body=x.body.padEnd(width,'-');});
     var barCuts=[0];
     for(var c=0;c<width;c++) if(parsed.filter(function(x){return x.body[c]==='|';}).length>=4) barCuts.push(c);
     if(barCuts[barCuts.length-1]!==width)barCuts.push(width);
@@ -788,26 +817,41 @@ function parseTabText(txt){
     baseBeat += Math.max(4,(barCuts.length-1)*4);
   });
   events.sort(function(a,b){return a.beat-b.beat||a.n-b.n;});
-  return {groups:groups.length,events:events};
+  return {groups:groups.length,events:events,cleaned:groups.map(function(g){return g.join('\n');}).join('\n\n')};
 }
 $('readTabBtn').onclick=async function(){
   if(!state.img){log('Load an image first.');return;}
   if(!state.sel){log('Drag around one or more complete six-line TAB blocks first.');return;}
-  if(typeof Tesseract==='undefined'){log('TAB OCR requires an internet connection the first time. You can also paste tab text into the box.');return;}
+  if(typeof Tesseract==='undefined'){log('TAB recognition requires an internet connection the first time.');return;}
   try{
     setProgress(.05);log('Reading selected guitar TAB…');
     var crop=cropCanvas(state.sel), up=document.createElement('canvas');
-    var scale=Math.max(2,Math.min(4,1800/Math.max(1,crop.width)));up.width=Math.round(crop.width*scale);up.height=Math.round(crop.height*scale);
-    var ux=up.getContext('2d');ux.fillStyle='#fff';ux.fillRect(0,0,up.width,up.height);ux.filter='grayscale(1) contrast(1.7)';ux.drawImage(crop,0,0,up.width,up.height);
-    var res=await Tesseract.recognize(up,'eng',{logger:function(m){if(m.status==='recognizing text')setProgress(m.progress||.1);}});
-    $('tabText').value=normaliseTabText(res.data.text);
-    setProgress(-1);log('TAB OCR complete. Check the text, then tap “Import TAB to MIDI track”.');toast('TAB text captured');
-  }catch(e){setProgress(-1);log('TAB OCR failed: '+e.message+'\nTry a tighter selection or paste the tab text manually.');}
+    var scale=Math.max(3,Math.min(5,2400/Math.max(1,crop.width)));
+    up.width=Math.round(crop.width*scale);up.height=Math.round(crop.height*scale);
+    var ux=up.getContext('2d');ux.fillStyle='#fff';ux.fillRect(0,0,up.width,up.height);
+    ux.imageSmoothingEnabled=false;ux.filter='grayscale(1) contrast(2.1)';ux.drawImage(crop,0,0,up.width,up.height);
+    var res=await Tesseract.recognize(up,'eng',{
+      tessedit_pageseg_mode:'6',
+      tessedit_char_whitelist:'eEBGDA0123456789|-hHpP/\\ ',
+      preserve_interword_spaces:'1',
+      logger:function(m){if(m.status==='recognizing text')setProgress(m.progress||.1);}
+    });
+    var parsed=parseTabText(res.data.text||'');
+    $('tabText').value=parsed.cleaned||normaliseTabText(res.data.text);
+    if(parsed.events.length){
+      state.tabEvents=parsed.events;
+      $('tabSummary').textContent='Imported '+parsed.events.length+' notes from '+parsed.groups+' six-line block'+(parsed.groups===1?'':'s')+'.';
+      setProgress(-1);log('TAB detected and imported automatically.');toast('TAB imported');
+    }else{
+      setProgress(-1);log('TAB rows were not recovered. Select only the six TAB lines, excluding the app toolbar and playback controls.');toast('TAB not recognised');
+    }
+  }catch(e){setProgress(-1);log('TAB recognition failed: '+e.message);}
 };
 $('parseTabBtn').onclick=function(){
   var r=parseTabText($('tabText').value);state.tabEvents=r.events;
+  if(r.cleaned)$('tabText').value=r.cleaned;
   $('tabSummary').textContent=r.events.length?('Imported '+r.events.length+' notes from '+r.groups+' six-line block'+(r.groups===1?'':'s')+'.'):('No valid six-line TAB blocks found.');
-  log(r.events.length?'TAB track ready for preview and MIDI export. Leave the chord progression empty to export the TAB track.':'Could not parse TAB. Each line should start e|, B|, G|, D|, A|, E|.');
+  log(r.events.length?'TAB track ready for preview and MIDI export.':'Could not identify six TAB rows.');
   toast(r.events.length?'TAB imported':'No TAB found');
 };
 $('clearTabBtn').onclick=function(){state.tabEvents=[];$('tabText').value='';$('tabSummary').textContent='No TAB notes imported.';toast('TAB track cleared');};
