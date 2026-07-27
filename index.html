@@ -36,7 +36,7 @@
           <button class="light" id="clearSelectionBtn">Clear selection</button>
         </div>
         <div id="progressBar"><div id="progressFill"></div></div>
-        <p class="hint">Drag around one chord diagram (including its name) then tap "Add selected area". Auto-detect works best on clean screenshots.</p>
+        <p class="hint">Drag around <b>one single chord diagram</b> (including its name at the top) then tap "Add selected area".</p>
         <div class="canvasWrap" id="canvasWrap"><canvas id="imageCanvas"></canvas><div id="selection" class="selection" hidden></div></div>
       </div>
       <div>
@@ -86,8 +86,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ================================================================
-// ChordScan Studio v1.1 — COMPLETE FIX: auto-detect at full res,
-// reliable fret recognition, no sub-pixel line loss
+// ChordScan Studio v1.1 — FIXED OCR (crops name zone) + FIXED Voicing
 // ================================================================
 
 var $ = function(id) { return document.getElementById(id); };
@@ -171,137 +170,116 @@ canvas.addEventListener('touchend',function(ev){ev.preventDefault();if(state.sel
 function clearSelection(){state.sel=null;selEl.hidden=true;selEl.style.width='0px';selEl.style.height='0px';}
 $('clearSelectionBtn').onclick=function(){clearSelection();toast('Cleared');};
 
-// ---- Crop: canvas-coords → image ----
-function cropCanvas(rect) {
+function cropCanvas(rect, subRect) {
+  var rx = rect.x / state.scale, ry = rect.y / state.scale;
+  var rw = rect.w / state.scale, rh = rect.h / state.scale;
+  if (subRect) {
+    rx += subRect.x * rw; ry += subRect.y * rh;
+    rw *= subRect.w; rh *= subRect.h;
+  }
   var c = document.createElement('canvas');
-  c.width  = Math.max(1, Math.round(rect.w / state.scale));
-  c.height = Math.max(1, Math.round(rect.h / state.scale));
-  c.getContext('2d').drawImage(state.img, rect.x/state.scale, rect.y/state.scale, rect.w/state.scale, rect.h/state.scale, 0, 0, c.width, c.height);
+  c.width = Math.max(1, Math.round(rw));
+  c.height = Math.max(1, Math.round(rh));
+  c.getContext('2d').drawImage(state.img, rx, ry, rw, rh, 0, 0, c.width, c.height);
   return c;
 }
 
 // ================================================================
-// CHORD RECOGNITION — reads fret positions from a cropped diagram
-// This runs at FULL RESOLUTION of the crop
+// ROBUST CHORD VOICING RECOGNITION
 // ================================================================
 function recognizeChord(cropCanvas) {
   var w = cropCanvas.width, h = cropCanvas.height;
   if (w < 30 || h < 50) return null;
 
   var iCtx = cropCanvas.getContext('2d');
-  var imageData = iCtx.getImageData(0, 0, w, h);
-  var d = imageData.data;
+  var imgData = iCtx.getImageData(0, 0, w, h);
+  var d = imgData.data;
 
-  // 1. Grayscale
+  // Grayscale & Otsu threshold
   var gray = new Uint8Array(w * h);
   for (var i = 0; i < w*h; i++) {
     var j = i*4;
     gray[i] = d[j]*0.299 + d[j+1]*0.587 + d[j+2]*0.114;
   }
-
-  // 2. Global Otsu-like threshold: split at median + offset
-  var sorted = new Uint8Array(gray);
-  sorted.sort(); // sorts in-place
-  var median = sorted[Math.floor(sorted.length * 0.5)];
-  var darkThresh = sorted[Math.floor(sorted.length * 0.15)]; // 15th percentile = "dark" pixels
-  var useThreshold = Math.max(darkThresh, median * 0.65);
-
-  // Binary: 1 = dark (ink), 0 = light (paper)
+  var sorted = new Uint8Array(gray); sorted.sort();
+  var darkThresh = sorted[Math.floor(sorted.length * 0.20)];
   var bin = new Uint8Array(w * h);
-  for (var i = 0; i < w*h; i++) {
-    bin[i] = gray[i] < useThreshold ? 1 : 0;
-  }
+  for (var i = 0; i < w*h; i++) bin[i] = gray[i] < darkThresh ? 1 : 0;
 
-  // 3. Horizontal projection — find fret lines
+  // Horizontal projection (fret lines)
   var hProj = new Uint32Array(h);
   for (var y = 0; y < h; y++) { var s=0; for(var x=0;x<w;x++) s+=bin[y*w+x]; hProj[y]=s; }
 
   var fretLines = [];
-  var minGap = Math.max(6, Math.round(h * 0.05));
-  for (var y = 2; y < h-2; y++) {
-    if (hProj[y] > w * 0.30 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
+  var minGap = Math.max(8, Math.round(h * 0.08));
+  for (var y = 4; y < h-4; y++) {
+    if (hProj[y] > w * 0.35 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
       if (!fretLines.length || y - fretLines[fretLines.length-1] > minGap) fretLines.push(y);
     }
   }
+  if (fretLines.length < 3) return null;
 
-  // Need at least 3 fret lines (nut + 2 frets)
-  if (fretLines.length < 3) {
-    // Fallback: look for any horizontal dark band structure
-    return null;
-  }
-
-  var numFrets = Math.min(fretLines.length - 1, 5);
-  if (numFrets < 2) return null;
-
-  // 4. Vertical projection — find string lines
+  // Vertical projection (strings)
   var vProj = new Uint32Array(w);
   for (var x = 0; x < w; x++) { var s=0; for(var y=0;y<h;y++) s+=bin[y*w+x]; vProj[x]=s; }
 
   var stringLines = [];
-  var minSGap = Math.max(3, Math.round(w * 0.03));
-  for (var x = 2; x < w-2; x++) {
-    if (vProj[x] > h * 0.18 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
+  var minSGap = Math.max(4, Math.round(w * 0.04));
+  for (var x = 3; x < w-3; x++) {
+    if (vProj[x] > h * 0.20 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
       if (!stringLines.length || x - stringLines[stringLines.length-1] > minSGap) stringLines.push(x);
     }
   }
-  if (stringLines.length < 4) return null;
-  // Keep strongest 6
-  while (stringLines.length > 6) stringLines.pop();
+  if (stringLines.length < 5) return null;
+  while (stringLines.length > 6) stringLines.shift(); // keep 6 strings
 
-  // 5. Determine nut line and marker area
   var nutY = fretLines[0];
-  var aboveNut = Math.max(1, Math.floor(nutY * 0.3));
-
-  // 6. Detect X/O markers above nut
   var voicing = ['x','x','x','x','x','x'];
-  var hw = Math.max(2, Math.round(w * 0.035));
 
+  // Check X / O markers above nut
   for (var si = 0; si < stringLines.length; si++) {
     var sx = stringLines[si];
-    var cx = Math.max(0, Math.min(w-1, sx));
-    var darkPix = 0, totalPix = 0;
-    for (var dy = Math.max(1, aboveNut-2); dy < nutY; dy++) {
-      for (var dx = Math.max(0, cx-hw); dx < Math.min(w, cx+hw+1); dx++) {
-        totalPix++;
-        if (bin[dy*w + dx]) darkPix++;
+    var topY = Math.max(0, Math.floor(nutY * 0.05));
+    var botY = Math.max(topY+3, nutY - 2);
+    var dark = 0, total = 0;
+    var hw = Math.max(3, Math.round((stringLines[1]-stringLines[0])*0.25 || w*0.04));
+    for (var dy = topY; dy < botY; dy++) {
+      for (var dx = Math.max(0, sx-hw); dx <= Math.min(w-1, sx+hw); dx++) {
+        total++;
+        if (bin[dy*w + dx]) dark++;
       }
     }
-    // If >30% dark in this column above nut → it's muted (X or finger)
-    // If <5% dark → it's open
-    if (totalPix > 0) {
-      var ratio = darkPix / totalPix;
-      if (ratio < 0.06) voicing[si] = 0;
-      else if (ratio > 0.35) voicing[si] = 'x';
-      else voicing[si] = 0; // borderline → open
+    if (total > 0) {
+      var ratio = dark / total;
+      // In chord diagrams, open strings have very little ink above nut, muted have 'X' (lots of ink)
+      voicing[si] = ratio < 0.08 ? 0 : 'x';
     }
   }
 
-  // 7. Detect dots at string×fret intersections
+  // Detect dots inside fret boxes (between fretLines[fi-1] and fretLines[fi])
   for (var fi = 1; fi < fretLines.length && fi <= 5; fi++) {
-    var fy = fretLines[fi], prevY = fretLines[fi-1];
-    var fretH = fy - prevY;
-    var dotCY = Math.round((prevY + fy) / 2);
-    var dotR = Math.max(2, Math.round(fretH * 0.30));
+    var topF = fretLines[fi-1], botF = fretLines[fi];
+    var fretH = botF - topF;
+    var centerY = Math.round((topF + botF) / 2);
+    var radius = Math.max(3, Math.round(fretH * 0.28));
 
     for (var si2 = 0; si2 < stringLines.length; si2++) {
       var sx2 = stringLines[si2];
-      // Already set as open? skip
-      if (voicing[si2] === 0) continue;
-
-      // Check for a dark dot centered at (sx2, dotCY)
-      var dark = 0, total = 0;
-      for (var dy2 = -dotR; dy2 <= dotR; dy2++) {
-        for (var dx2 = -dotR; dx2 <= dotR; dx2++) {
-          if (dx2*dx2 + dy2*dy2 > dotR*dotR) continue;
-          var px = sx2 + dx2, py = dotCY + dy2;
+      // Count dark pixels inside dot circle
+      var dotDark = 0, dotTotal = 0;
+      for (var dy2 = -radius; dy2 <= radius; dy2++) {
+        for (var dx2 = -radius; dx2 <= radius; dx2++) {
+          if (dx2*dx2 + dy2*dy2 > radius*radius) continue;
+          var px = sx2 + dx2, py = centerY + dy2;
           if (px >= 0 && px < w && py >= 0 && py < h) {
-            total++;
-            if (bin[py*w + px]) dark++;
+            dotTotal++;
+            if (bin[py*w + px]) dotDark++;
           }
         }
       }
-      // >35% dark in circle = finger dot
-      if (total > 0 && dark / total > 0.35) voicing[si2] = fi;
+      if (dotTotal > 0 && (dotDark / dotTotal) > 0.42) {
+        voicing[si2] = fi;
+      }
     }
   }
 
@@ -327,7 +305,7 @@ async function addRect(rect) {
       chord.voicing = det;
       chord.confidence = 'auto';
     }
-  } catch(e) { /* fallback */ }
+  } catch(e) { console.error(e); }
 
   state.chords.push(chord);
   renderChordList();
@@ -336,14 +314,17 @@ async function addRect(rect) {
   log('Reading chord name…');
   try {
     if (window.Tesseract) {
-      var res = await Tesseract.recognize(crop, 'eng', {
+      // ** CRITICAL FIX: Crop strictly to top 22% for OCR (the name area) **
+      var nameCrop = cropCanvas(rect, {x: 0, y: 0, w: 1, h: 0.24});
+      
+      var res = await Tesseract.recognize(nameCrop, 'eng', {
         logger: function(m) {
           if (m.status === 'recognizing text')
-            log('Reading… ' + Math.round(m.progress*100) + '%');
+            log('Reading name… ' + Math.round(m.progress*100) + '%');
         }
       });
       var raw = res.data.text.replace(/\s+/g,'').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g,'');
-      if (raw) {
+      if (raw && raw.length <= 8) {
         chord.name = raw.replace('♭','b');
         chord.confidence = Math.round(res.data.confidence)+'%';
         renderChordList();
@@ -351,10 +332,10 @@ async function addRect(rect) {
       }
       log('Added ' + chord.name + '. Voicing: ' + chord.voicing.join(' '));
     } else {
-      log('Added diagram. OCR unavailable.');
+      log('Added diagram.');
     }
   } catch(err) {
-    log('Added diagram. Name may need correction.');
+    log('Added diagram.');
   }
 }
 
@@ -366,8 +347,7 @@ $('addSelectionBtn').onclick = function() {
 };
 
 // ================================================================
-// AUTO-DETECT — works at full resolution via edge projection
-// No sub-pixel line loss because we never downsample below 500px
+// AUTO-DETECT DIAGRAMS
 // ================================================================
 $('autoDetectBtn').onclick = async function() {
   if (!state.img) { toast('Load an image first'); return; }
@@ -376,8 +356,6 @@ $('autoDetectBtn').onclick = async function() {
   log('Auto-detecting chord diagrams…');
 
   var W = state.img.width, H = state.img.height;
-
-  // Work at a resolution that preserves thin lines: min(800, W)
   var scanW = Math.min(800, W);
   var scanH = Math.round(H * (scanW / W));
   var scanCanvas = document.createElement('canvas');
@@ -386,89 +364,64 @@ $('autoDetectBtn').onclick = async function() {
   sCtx.drawImage(state.img, 0, 0, scanW, scanH);
   var sd = sCtx.getImageData(0, 0, scanW, scanH).data;
 
-  setProgress(0.1);
+  setProgress(0.2);
 
-  // Edge detection: horizontal and vertical differences
-  var edgeH = new Float32Array(scanW * scanH);
-  var edgeV = new Float32Array(scanW * scanH);
   var edge = new Float32Array(scanW * scanH);
   for (var y = 1; y < scanH-1; y++) {
     for (var x = 1; x < scanW-1; x++) {
       var i = (y*scanW + x) * 4;
-      var lum = sd[i]*0.299 + sd[i+1]*0.587 + sd[i+2]*0.114;
-      var lL = sd[((y)*scanW + (x-1))*4]*0.299 + sd[((y)*scanW + (x-1))*4+1]*0.587 + sd[((y)*scanW + (x-1))*4+2]*0.114;
-      var rL = sd[((y)*scanW + (x+1))*4]*0.299 + sd[((y)*scanW + (x+1))*4+1]*0.587 + sd[((y)*scanW + (x+1))*4+2]*0.114;
-      var uL = sd[((y-1)*scanW + x)*4]*0.299 + sd[((y-1)*scanW + x)*4+1]*0.587 + sd[((y-1)*scanW + x)*4+2]*0.114;
-      var dL = sd[((y+1)*scanW + x)*4]*0.299 + sd[((y+1)*scanW + x)*4+1]*0.587 + sd[((y+1)*scanW + x)*4+2]*0.114;
-      var idx = y*scanW + x;
-      edgeH[idx] = Math.abs(rL - lL);
-      edgeV[idx] = Math.abs(dL - uL);
-      edge[idx] = Math.sqrt(edgeH[idx]*edgeH[idx] + edgeV[idx]*edgeV[idx]);
+      var lL = sd[((y)*scanW + (x-1))*4]*0.299;
+      var rL = sd[((y)*scanW + (x+1))*4]*0.299;
+      var uL = sd[((y-1)*scanW + x)*4]*0.299;
+      var dL = sd[((y+1)*scanW + x)*4]*0.299;
+      edge[y*scanW + x] = Math.abs(rL - lL) + Math.abs(dL - uL);
     }
   }
 
-  setProgress(0.3);
-
-  // Threshold edges: keep strongest 15%
-  var edgeSorted = new Float32Array(edge);
-  edgeSorted.sort();
-  var edgeThresh = edgeSorted[Math.floor(edgeSorted.length * 0.85)] || 30;
+  var edgeSorted = new Float32Array(edge); edgeSorted.sort();
+  var edgeThresh = edgeSorted[Math.floor(edgeSorted.length * 0.88)] || 30;
   var edgeBin = new Uint8Array(scanW * scanH);
   for (var i = 0; i < scanW*scanH; i++) edgeBin[i] = edge[i] > edgeThresh ? 1 : 0;
 
-  // Horizontal projection of edge pixels
   var hEdgeProj = new Uint32Array(scanH);
   for (var y = 0; y < scanH; y++) { var s=0; for(var x=0;x<scanW;x++) s+=edgeBin[y*scanW+x]; hEdgeProj[y]=s; }
-
-  // Vertical projection of edge pixels
   var vEdgeProj = new Uint32Array(scanW);
   for (var x = 0; x < scanW; x++) { var s=0; for(var y=0;y<scanH;y++) s+=edgeBin[y*scanW+x]; vEdgeProj[x]=s; }
 
   setProgress(0.5);
 
-  // Find horizontal bands (fret regions) where edge density is high
-  var hBandThresh = scanW * 0.08; // at least 8% of pixels in a row are edge
+  var hThresh = scanW * 0.06;
   var hBands = []; var inB=false, bS=0;
   for (var y = 0; y < scanH; y++) {
-    if (hEdgeProj[y] > hBandThresh && !inB) { inB=true; bS=y; }
-    else if (hEdgeProj[y] <= hBandThresh && inB) { if(y-bS>20) hBands.push({s:bS,e:y}); inB=false; }
+    if (hEdgeProj[y] > hThresh && !inB) { inB=true; bS=y; }
+    else if (hEdgeProj[y] <= hThresh && inB) { if(y-bS>15) hBands.push({s:bS,e:y}); inB=false; }
   }
-  if (inB && scanH-bS>20) hBands.push({s:bS,e:scanH});
+  if (inB && scanH-bS>15) hBands.push({s:bS,e:scanH});
 
-  // Find vertical bands (string regions)
-  var vBandThresh = scanH * 0.05;
+  var vThresh = scanH * 0.04;
   var vBands = []; inB=false; bS=0;
   for (var x = 0; x < scanW; x++) {
-    if (vEdgeProj[x] > vBandThresh && !inB) { inB=true; bS=x; }
-    else if (vEdgeProj[x] <= vBandThresh && inB) { if(x-bS>10) vBands.push({s:bS,e:x}); inB=false; }
+    if (vEdgeProj[x] > vThresh && !inB) { inB=true; bS=x; }
+    else if (vEdgeProj[x] <= vThresh && inB) { if(x-bS>10) vBands.push({s:bS,e:x}); inB=false; }
   }
   if (inB && scanW-bS>10) vBands.push({s:bS,e:scanW});
 
   setProgress(0.7);
 
-  // Overlap: candidates are where hBands and vBands intersect
   var candidates = [];
   for (var hi = 0; hi < hBands.length; hi++) {
     for (var vi = 0; vi < vBands.length; vi++) {
       var bw = vBands[vi].e - vBands[vi].s;
       var bh = hBands[hi].e - hBands[hi].s;
       var aspect = bw / bh;
-      if (aspect < 0.4 || aspect > 2.0) continue;
-      if (bw < 30 || bh < 40) continue;
-      candidates.push({
-        x: vBands[vi].s, y: hBands[hi].s, w: bw, h: bh,
-        score: bw*bh
-      });
+      if (aspect < 0.4 || aspect > 2.2) continue;
+      if (bw < 25 || bh < 30) continue;
+      candidates.push({x: vBands[vi].s, y: hBands[hi].s, w: bw, h: bh, score: bw*bh});
     }
   }
 
-  if (!candidates.length) {
-    log('No clear diagrams found. Try manual selection.');
-    setProgress(-1);
-    return;
-  }
+  if (!candidates.length) { log('No diagrams found.'); setProgress(-1); return; }
 
-  // Merge overlapping
   candidates.sort(function(a,b){return b.score - a.score;});
   var merged = [];
   for (var ci = 0; ci < candidates.length; ci++) {
@@ -483,33 +436,30 @@ $('autoDetectBtn').onclick = async function() {
     if (!overlap && merged.length < 24) merged.push(c);
   }
 
-  setProgress(0.85);
+  setProgress(0.9);
   log('Found ' + merged.length + ' diagrams. Adding…');
 
-  // Scan coords → image coords → canvas coords
   var imgScaleX = W / scanW;
   var imgScaleY = H / scanH;
 
   for (var mi2 = 0; mi2 < merged.length; mi2++) {
     if (state.autoDetectAbort) break;
     var cand = merged[mi2];
-    // Add generous padding (name is above diagram)
-    var padY = Math.round(cand.h * 0.35);
-    var padX = Math.round(cand.w * 0.08);
-    // Convert to canvas coords
+    var padY = Math.round(cand.h * 0.45); // extra space for chord name above
+    var padX = Math.round(cand.w * 0.1);
     var canvasRect = {
       x: Math.round(Math.max(0, cand.x - padX) * imgScaleX * state.scale),
       y: Math.round(Math.max(0, cand.y - padY) * imgScaleY * state.scale),
       w: Math.round((cand.w + padX*2) * imgScaleX * state.scale),
       h: Math.round((cand.h + padY) * imgScaleY * state.scale)
     };
-    setProgress(0.85 + (mi2/merged.length)*0.12);
+    setProgress(0.9 + (mi2/merged.length)*0.1);
     await addRect(canvasRect);
   }
 
   setProgress(-1);
   toast('Added ' + merged.length + ' diagrams');
-  log('Done — ' + merged.length + ' diagrams added. Edit in tab 2.');
+  log('Done — ' + merged.length + ' diagrams added.');
 };
 
 // ---- Chord list ----
@@ -573,7 +523,7 @@ function move(i,d){var j=i+d;if(j<0||j>=state.progression.length)return;var t=st
 // ---- Audio ----
 function buildEvents(){var bpm=+$('tempo').value||100,bb=+$('timeSig').value||4,pat=$('pattern').value,ev=[],bt=0;for(var pi=0;pi<state.progression.length;pi++){var st=state.progression[pi],c=state.chords.find(function(x){return x.id===st.chordId;});if(!c)continue;var n=voicingNotes(c),d=st.bars*bb;if(pat==='block')n.forEach(function(v){ev.push({beat:bt,n:v,dur:d,vel:90});});else if(pat==='down'){for(var b=0;b<d;b+=1)n.forEach(function(v,k){ev.push({beat:bt+b+k*.025,n:v,dur:.82,vel:92-k*3});});}else if(pat==='updown'){for(var b=0;b<d;b+=.5){var r=Math.round(b*2)%2?n.slice().reverse():n;r.forEach(function(v,k){ev.push({beat:bt+b+k*.018,n:v,dur:.38,vel:86});});}}else{for(var b=0;b<d;b+=.5){var v=n[Math.floor((b*2)%Math.max(1,n.length))];if(v!=null)ev.push({beat:bt+b,n:v,dur:.45,vel:88});}}bt+=d;}return{bpm:bpm,bb:bb,ev:ev,total:bt};}
 function stopAudio(){if(state.audio){state.audio.close();state.audio=null;}}
-$('playBtn').onclick=function(){stopAudio();var seq=buildEvents();if(!seq.ev.length)return;var ac=new(window.AudioContext||window.webkitAudioContext)();state.audio=ac;var sec=60/seq.bpm;seq.ev.forEach(function(e){var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+.06+e.beat*sec,d=Math.max(.05,(e.dur||.5)*sec);o.type='triangle';o.frequency.value=440*Math.pow(2,(e.n-69)/12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.03);});};
+$('playBtn').onclick=function(){stopAudio();var seq=buildEvents();if(!seq.ev.length)return;var ac=new(window.AudioContext||window.webkitAudioContext)();state.audio=ac;var sec=60/seq.bpm;seq.ev.forEach(function(e){var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+.06+e.beat*sec,d=Math.max(.05,(e.dur||.5)*sec);o.type='triangle';o.frequency.value=440*Math.pow(2,(e.n-69)/12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+.008);g.gain.exponentialRampToValueAtTime(0.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.03);});};
 $('stopBtn').onclick=stopAudio;
 
 // ---- MIDI Export ----
@@ -587,7 +537,7 @@ $('exportMidi').onclick=function(){try{download(makeMidi(),'chordscan_progressio
 function readBytes(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(new Uint8Array(r.result));};r.onerror=rej;r.readAsArrayBuffer(f);});}
 function decodeText(b){if(b[0]===255&&b[1]===254){var s='';for(var i=2;i+1<b.length;i+=2)s+=String.fromCharCode(b[i]|b[i+1]<<8);return s;}return new TextDecoder().decode(b);}
 function enc16(s){var o=new Uint8Array(2+s.length*2);o[0]=255;o[1]=254;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);o[2+i*2]=c&255;o[3+i*2]=c>>8;}return o;}
-$('exportRiffle').onclick=async function(){try{var f=$('riffleTemplate').files[0];if(!f)throw Error('Choose a template.');var nums=decodeText(await readBytes(f)).split(',').map(function(x){return parseInt(x.trim(),10);}).filter(Number.isFinite);if(nums.length<1200)throw Error('Invalid.');var seq=buildEvents();if(!seq.ev.length)throw Error('Build a progression.');var mel=seq.ev.slice().sort(function(a,b){return a.beat-b.beat||b.n-a.n;}).filter(function(e,i,a){return i===0||e.beat!==a[i-1].beat;}).map(function(e){return e.n;});var start=1024,max=Math.min(+$('maxSlots').value||128,nums.length-start),off=+$('pitchOffset').value;for(var i=0;i<max;i++)nums[start+i]=i<mel.length?mel[i]+off:-1;download(enc16(nums.join(',')),'chordscan_progression.riffle');}catch(e){alert(e.message);}};
+$('exportRiffle').onclick=async function(){try{var f=$('riffleTemplate').files[0];if(!f)throw Error('Choose a template.');var nums=decodeText(await readBytes(f)).split(',').map(function(x){return parseInt(x.trim(),10);}).filter(Number.isFinite);if(nums.length<1200)throw Error('Invalid.');var seq=buildEvents();if(!seq.ev.length)throw Error('Build a progression.');var mel=seq.ev.slice().sort(function(a,b){return a.beat-b.beat||b.n-a.n;}).filter(function(e,i,a){return i===0||e.beat!==a[i-1].beat;}).map(function(e){return e.n;});var start=1024,max=Math.min(+$('maxSlots').value||128,nums.length-start),off=+$('pitchOffset').value;for(var i=0;i<max;i++)nums[start+i]=i<mel.length?mel[i]+off:-1;download(enc16(nums.join(',')),'chordscan_progression.riffle');}catch(e){alert(e.message);}}
 
 // ---- Init ----
 renderChordList(); renderProgression();
