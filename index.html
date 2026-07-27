@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ChordScan Studio v1</title>
+<title>ChordScan Studio v1.1</title>
 <style>
 :root{--bg:#f6f2e9;--card:#fff;--ink:#17231c;--muted:#687269;--line:#d9d0c2;--green:#2f4f3e;--sage:#7a8f7b;--cream:#f4f1ea;--danger:#9d3b35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
 </style>
 </head>
 <body>
-<header><h1>ChordScan Studio v1</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
+<header><h1>ChordScan Studio v1.1</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
 <div class="wrap">
   <div class="tabbar">
     <button class="active" data-pane="scan">1. Scan</button>
@@ -23,7 +23,13 @@
     <div class="grid">
       <div class="card">
         <h2>Import chord sheet</h2>
-        <input id="imageFile" type="file" accept="image/*" capture="environment">
+        <div class="row">
+          <label class="btn" for="imageFile">Choose photo or file</label>
+          <label class="btn secondary" for="cameraFile">Take a photo</label>
+        </div>
+        <input id="imageFile" type="file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+        <input id="cameraFile" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+        <p class="hint" style="margin:8px 0 0">On iPhone or iPad, “Choose photo or file” opens the normal picker. “Take a photo” opens the camera directly.</p>
         <div class="row" style="margin-top:10px">
           <button id="autoDetectBtn" disabled>Auto-detect diagrams</button>
           <button class="secondary" id="addSelectionBtn" disabled>Add selected area</button>
@@ -84,7 +90,34 @@ function switchPane(id){document.querySelectorAll('.pane').forEach(x=>x.classLis
 document.querySelectorAll('.tabbar button').forEach(b=>b.onclick=()=>switchPane(b.dataset.pane));
 
 const canvas=$('imageCanvas'),ctx=canvas.getContext('2d'),wrap=$('canvasWrap'),selEl=$('selection');
-$('imageFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{state.img=im;const maxW=Math.min(1050,wrap.clientWidth||900);state.scale=Math.min(1,maxW/im.width);canvas.width=Math.round(im.width*state.scale);canvas.height=Math.round(im.height*state.scale);ctx.drawImage(im,0,0,canvas.width,canvas.height);$('autoDetectBtn').disabled=false;$('addSelectionBtn').disabled=false;log(`Loaded ${f.name}\nImage: ${im.width} × ${im.height}\nDrag around a diagram or try auto-detect.`)};im.src=URL.createObjectURL(f)};
+function loadImageFile(f,input){
+  if(!f)return;
+  if(!f.type.startsWith('image/')){log('That file is not a supported image. Please choose a JPG, PNG, HEIC or other image file.');return;}
+  const url=URL.createObjectURL(f);
+  const im=new Image();
+  im.onload=()=>{
+    state.img=im;
+    const maxW=Math.min(1050,wrap.clientWidth||900);
+    state.scale=Math.min(1,maxW/im.width);
+    canvas.width=Math.round(im.width*state.scale);
+    canvas.height=Math.round(im.height*state.scale);
+    ctx.drawImage(im,0,0,canvas.width,canvas.height);
+    $('autoDetectBtn').disabled=false;
+    $('addSelectionBtn').disabled=false;
+    clearSelection();
+    log(`Loaded ${f.name || 'photo'}\nImage: ${im.width} × ${im.height}\nDrag around a diagram or try auto-detect.`);
+    URL.revokeObjectURL(url);
+    if(input) input.value='';
+  };
+  im.onerror=()=>{
+    URL.revokeObjectURL(url);
+    log('The image could not be opened. If it is an HEIC photo, try saving or sharing it as JPEG first.');
+    if(input) input.value='';
+  };
+  im.src=url;
+}
+$('imageFile').onchange=e=>loadImageFile(e.target.files&&e.target.files[0],e.target);
+$('cameraFile').onchange=e=>loadImageFile(e.target.files&&e.target.files[0],e.target);
 let drag=false,start={x:0,y:0};
 function pos(ev){const r=canvas.getBoundingClientRect(),p=ev.touches?ev.touches[0]:ev;return{x:Math.max(0,Math.min(canvas.width,p.clientX-r.left)),y:Math.max(0,Math.min(canvas.height,p.clientY-r.top))}}
 function drawSel(a,b){const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);state.sel={x,y,w,h};Object.assign(selEl.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});selEl.hidden=false}
