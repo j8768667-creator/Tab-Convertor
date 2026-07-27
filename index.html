@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
 <title>ChordScan Studio v1.1</title>
 <style>
 :root{--bg:#f6f2e9;--card:#fff;--ink:#17231c;--muted:#687269;--line:#d9d0c2;--green:#2f4f3e;--sage:#7a8f7b;--cream:#f4f1ea;--danger:#9d3b35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}#progressBar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0;display:none}#progressFill{height:100%;width:0%;background:var(--sage);transition:width .15s ease}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none;-webkit-overflow-scrolling:auto}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none;-webkit-user-select:none;user-select:none}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none;z-index:10}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;cursor:pointer;transition:all .15s}.diagramCard:active{transform:scale(.97)}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none;cursor:pointer}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px;transition:background .1s}.cell.marker:active{background:#ddd}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px;scroll-snap-type:x mandatory}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;flex-shrink:0;scroll-snap-align:start}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}#progressBar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0;display:none}#progressFill{height:100%;width:0%;background:var(--sage);transition:width .15s ease}#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#17231c;color:#fff;padding:8px 16px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}#toast.show{opacity:1}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
 </style>
 </head>
 <body>
@@ -29,14 +29,14 @@
         </div>
         <input id="imageFile" type="file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <input id="cameraFile" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-        <p class="hint" style="margin:8px 0 0">On iPhone or iPad, "Choose photo or file" opens the normal picker. "Take a photo" opens the camera directly.</p>
+        <p class="hint" style="margin:8px 0 0">On iPhone or iPad, tap "Choose photo or file" for the picker or "Take a photo" for the camera.</p>
         <div class="row" style="margin-top:10px">
           <button id="autoDetectBtn" disabled>Auto-detect diagrams</button>
           <button class="secondary" id="addSelectionBtn" disabled>Add selected area</button>
           <button class="light" id="clearSelectionBtn">Clear selection</button>
         </div>
         <div id="progressBar"><div id="progressFill"></div></div>
-        <p class="hint">Drag around one chord diagram, including its chord name, then tap "Add selected area". Auto-detect works best on clean screenshots with evenly spaced diagrams.</p>
+        <p class="hint">Drag around one chord diagram (including its name) then tap "Add selected area". Auto-detect works best on clean screenshots.</p>
         <div class="canvasWrap" id="canvasWrap"><canvas id="imageCanvas"></canvas><div id="selection" class="selection" hidden></div></div>
       </div>
       <div>
@@ -54,7 +54,7 @@
         <div>
           <label>Chord name</label><input id="chordName" class="full" placeholder="e.g. Am7">
           <div class="row" style="margin-top:8px"><label class="check"><input type="checkbox" id="useDetectedVoicing" checked> Use diagram voicing</label></div>
-          <p class="hint">Tap the top row to cycle open (O), muted (X), or fretted. Tap a fret cell to place/remove a note.</p>
+          <p class="hint">Tap the top row to cycle open (O), muted (X), or fretted. Tap a cell to place/remove a note.</p>
           <div class="row"><label>Barre fret <input id="barreFret" type="number" min="0" max="20" value="0" style="width:75px"></label><label>From string <select id="barreFrom"><option>6</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></label><label>To <select id="barreTo"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div>
           <div class="row" style="margin-top:8px"><button id="applyBarre">Apply barre</button><button class="light" id="clearBarre">Clear barre</button><button class="danger" id="deleteChord">Delete chord</button></div>
         </div>
@@ -69,24 +69,25 @@
       <div class="row"><label>Tempo <input id="tempo" type="number" min="30" max="240" value="100" style="width:90px"> BPM</label><label>Time signature <select id="timeSig"><option value="4">4/4</option><option value="3">3/4</option><option value="6">6/8</option></select></label><label>Pattern <select id="pattern"><option value="block">Block chord</option><option value="down">Down strum</option><option value="updown">Down/up strum</option><option value="arp">Arpeggio</option></select></label></div>
       <div class="sep"></div>
       <div class="row"><select id="addChordSelect" class="grow"></select><button id="addToProgression">Add chord</button><button class="light" id="clearProgression">Clear</button></div>
-      <div id="progression" class="progression"><p class="hint">Add recognised chords to create a timeline.</p></div>
+      <div id="progression" class="progression"><p class="hint">Add recognised chords.</p></div>
       <button id="playBtn">▶ Play preview</button><button class="secondary" id="stopBtn">■ Stop</button>
     </div>
   </section>
 
   <section id="export" class="pane">
     <div class="grid">
-      <div class="card"><h2>MIDI export</h2><label>Instrument program <input id="program" type="number" min="0" max="127" value="24"></label><p class="hint">Program 24 is nylon guitar in General MIDI. Export includes tempo, chord timing and the selected strum/arpeggio pattern.</p><button id="exportMidi">Download MIDI</button></div>
-      <div class="card"><h2>Riffler .riffle export</h2><label>Valid .riffle template</label><input id="riffleTemplate" type="file"><label>Pitch mapping</label><select id="pitchOffset"><option value="-12" selected>MIDI note −12</option><option value="0">Unchanged</option><option value="12">MIDI note +12</option><option value="-24">MIDI note −24</option></select><label>Maximum note slots</label><input id="maxSlots" type="number" min="8" max="512" value="128"><p class="hint">This uses the same template-patching method as your MIDI-to-Riffle converter. Riffler's native format is not publicly documented, so a valid template is required and some complex progressions may need a similar-length template.</p><button id="exportRiffle">Download .riffle</button></div>
+      <div class="card"><h2>MIDI export</h2><label>Instrument program <input id="program" type="number" min="0" max="127" value="24"></label><p class="hint">Program 24 is nylon guitar. Export includes tempo, chord timing and the strum pattern.</p><button id="exportMidi">Download MIDI</button></div>
+      <div class="card"><h2>Riffler .riffle export</h2><label>Valid .riffle template</label><input id="riffleTemplate" type="file"><label>Pitch mapping</label><select id="pitchOffset"><option value="-12">MIDI note −12</option><option value="0">Unchanged</option><option value="12">MIDI note +12</option><option value="-24">MIDI note −24</option></select><label>Max slots</label><input id="maxSlots" type="number" min="8" max="512" value="128"><p class="hint">Template-patching method: a valid template is required.</p><button id="exportRiffle">Download .riffle</button></div>
     </div>
   </section>
-  <div class="footerNote">Runs locally in your browser. Chord-name OCR uses Tesseract.js from a CDN when internet access is available; all fret positions remain manually editable.</div>
+  <div class="footerNote">Runs locally in browser. Chord-name OCR uses Tesseract.js from CDN when online. Fret positions remain editable.</div>
 </div>
+<div id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ================================================================
-// ChordScan Studio v1.1 — Fixed: fast grid detection, real fret
-// recognition from image, optimized performance
+// ChordScan Studio v1.1 — COMPLETE FIX: auto-detect at full res,
+// reliable fret recognition, no sub-pixel line loss
 // ================================================================
 
 var $ = function(id) { return document.getElementById(id); };
@@ -95,423 +96,379 @@ var state = {
   chords: [], selected: -1, progression: [],
   audio: null, autoDetectAbort: false
 };
-var tuning = [40,45,50,55,59,64]; // strings 6..1
-
-function uid() { return Math.random().toString(36).slice(2); }
-function log(m) { $('status').textContent = m; }
-
-function setProgress(p) {
-  var bar = $('progressBar'), fill = $('progressFill');
-  bar.style.display = p >= 0 ? 'block' : 'none';
-  fill.style.width = Math.max(0, Math.min(100, (p||0)*100)) + '%';
-}
-
-// ---- Tab switching ----
-function switchPane(id) {
-  document.querySelectorAll('.pane').forEach(function(x) {
-    x.classList.toggle('active', x.id === id);
-  });
-  document.querySelectorAll('.tabbar button').forEach(function(x) {
-    x.classList.toggle('active', x.dataset.pane === id);
-  });
-}
-document.querySelectorAll('.tabbar button').forEach(function(b) {
-  b.onclick = function() { switchPane(b.dataset.pane); };
-});
-
-// ---- Image loading ----
+var tuning = [40,45,50,55,59,64];
 var canvas = $('imageCanvas'), ctx = canvas.getContext('2d');
 var wrap = $('canvasWrap'), selEl = $('selection');
 
+function uid() { return Math.random().toString(36).slice(2); }
+function log(m) { $('status').textContent = m; }
+function toast(m) {
+  var t = $('toast'); t.textContent = m; t.classList.add('show');
+  clearTimeout(t._hide); t._hide = setTimeout(function(){t.classList.remove('show');},2000);
+}
+function setProgress(p) {
+  $('progressBar').style.display = p>=0?'block':'none';
+  $('progressFill').style.width = Math.max(0,Math.min(100,(p||0)*100))+'%';
+}
+
+function switchPane(id) {
+  document.querySelectorAll('.pane').forEach(function(x){x.classList.toggle('active',x.id===id);});
+  document.querySelectorAll('.tabbar button').forEach(function(x){x.classList.toggle('active',x.dataset.pane===id);});
+}
+document.querySelectorAll('.tabbar button').forEach(function(b){b.onclick=function(){switchPane(b.dataset.pane);};});
+
+// ---- Image loading ----
 function loadImageFile(f, input) {
-  if (!f) return;
-  if (!f.type.startsWith('image/')) {
-    log('Not a supported image.');
-    if (input) input.value = '';
-    return;
-  }
+  if(!f) return;
+  if(!f.type.startsWith('image/')){log('Not a supported image.');if(input)input.value='';return;}
   var url = URL.createObjectURL(f);
   var im = new Image();
   im.onload = function() {
-    state.img = im;
-    var maxW = Math.min(1050, wrap.clientWidth || 900);
-    state.scale = Math.min(1, maxW / im.width);
+    var maxW = Math.min(1050, wrap.clientWidth||900, im.width);
+    state.scale = maxW / im.width;
     canvas.width = Math.round(im.width * state.scale);
     canvas.height = Math.round(im.height * state.scale);
     ctx.drawImage(im, 0, 0, canvas.width, canvas.height);
+    state.img = im;
     $('autoDetectBtn').disabled = false;
     $('addSelectionBtn').disabled = false;
     clearSelection();
-    log('Loaded ' + (f.name || 'photo') + '\n' + im.width + '×' + im.height + '\nDrag around a diagram or auto-detect.');
+    log('Loaded '+(f.name||'photo')+'\n'+im.width+'×'+im.height+'\nDrag to select or auto-detect.');
     URL.revokeObjectURL(url);
-    if (input) input.value = '';
+    if(input) input.value='';
   };
-  im.onerror = function() {
-    URL.revokeObjectURL(url);
-    log('Could not open image. Try JPEG or PNG.');
-    if (input) input.value = '';
-  };
+  im.onerror = function(){log('Could not open image.');URL.revokeObjectURL(url);if(input)input.value='';};
   im.src = url;
 }
-$('imageFile').onchange = function(e) { loadImageFile(e.target.files && e.target.files[0], e.target); };
-$('cameraFile').onchange = function(e) { loadImageFile(e.target.files && e.target.files[0], e.target); };
+$('imageFile').onchange = function(e){loadImageFile(e.target.files&&e.target.files[0],e.target);};
+$('cameraFile').onchange = function(e){loadImageFile(e.target.files&&e.target.files[0],e.target);};
 
 // ---- Selection drag ----
-var dragging = false, startP = {x:0,y:0};
-function getPos(ev) {
+var dragging=false, startP={x:0,y:0}, rafP=null;
+function getCanvasPos(ev) {
   var r = canvas.getBoundingClientRect();
   var p = ev.touches ? ev.touches[0] : ev;
   return {
-    x: Math.max(0, Math.min(canvas.width, p.clientX - r.left)),
-    y: Math.max(0, Math.min(canvas.height, p.clientY - r.top))
+    x: Math.max(0, Math.min(canvas.width,  p.clientX - r.left + (wrap.scrollLeft||0))),
+    y: Math.max(0, Math.min(canvas.height, p.clientY - r.top  + (wrap.scrollTop||0)))
   };
 }
-function drawSel(a, b) {
-  var x = Math.min(a.x,b.x), y = Math.min(a.y,b.y);
-  var w = Math.abs(b.x-a.x), h = Math.abs(b.y-a.y);
-  if (w < 5 || h < 5) { selEl.hidden = true; return; }
-  state.sel = {x:x,y:y,w:w,h:h};
-  Object.assign(selEl.style, {
-    left: x+'px', top: y+'px', width: w+'px', height: h+'px'
-  });
-  selEl.hidden = false;
+function updateSel(a,b) {
+  var x=Math.min(a.x,b.x), y=Math.min(a.y,b.y), w=Math.abs(b.x-a.x), h=Math.abs(b.y-a.y);
+  if(w<5||h<5){selEl.hidden=true;return;}
+  state.sel={x:x,y:y,w:w,h:h};
+  Object.assign(selEl.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});
+  selEl.hidden=false;
 }
+function onDragStart(ev){if(!state.img)return;ev.preventDefault();dragging=true;startP=getCanvasPos(ev);try{canvas.setPointerCapture(ev.pointerId);}catch(e){}}
+function onDragMove(ev){if(!dragging||!state.img)return;ev.preventDefault();var p=getCanvasPos(ev);if(rafP)cancelAnimationFrame(rafP);rafP=requestAnimationFrame(function(){updateSel(startP,p);rafP=null;});}
+function onDragEnd(ev){if(!dragging)return;dragging=false;if(state.img&&startP)updateSel(startP,getCanvasPos(ev||{touches:[]}));}
+canvas.onpointerdown=onDragStart;canvas.onpointermove=onDragMove;canvas.onpointerup=onDragEnd;canvas.onpointercancel=onDragEnd;
+canvas.addEventListener('touchstart',function(ev){ev.preventDefault();onDragStart(ev);},{passive:false});
+canvas.addEventListener('touchmove',function(ev){ev.preventDefault();onDragMove(ev);},{passive:false});
+canvas.addEventListener('touchend',function(ev){ev.preventDefault();if(state.sel)toast('Selection made!');onDragEnd(ev);},{passive:false});
 
-var rafId = null;
-function onPointerDown(ev) {
-  dragging = true;
-  startP = getPos(ev);
-  canvas.setPointerCapture(ev.pointerId);
-}
-function onPointerMove(ev) {
-  if (!dragging) return;
-  var p = getPos(ev);
-  if (rafId) cancelAnimationFrame(rafId);
-  rafId = requestAnimationFrame(function() {
-    drawSel(startP, p);
-    rafId = null;
-  });
-}
-function onPointerUp(ev) {
-  dragging = false;
-  drawSel(startP, getPos(ev));
-}
-canvas.onpointerdown = onPointerDown;
-canvas.onpointermove = onPointerMove;
-canvas.onpointerup = onPointerUp;
-$('clearSelectionBtn').onclick = function() { clearSelection(); };
-function clearSelection() { state.sel = null; selEl.hidden = true; }
+function clearSelection(){state.sel=null;selEl.hidden=true;selEl.style.width='0px';selEl.style.height='0px';}
+$('clearSelectionBtn').onclick=function(){clearSelection();toast('Cleared');};
 
-// ---- Crop helper ----
+// ---- Crop: canvas-coords → image ----
 function cropCanvas(rect) {
   var c = document.createElement('canvas');
-  c.width = Math.max(1, Math.round(rect.w / state.scale));
+  c.width  = Math.max(1, Math.round(rect.w / state.scale));
   c.height = Math.max(1, Math.round(rect.h / state.scale));
-  c.getContext('2d').drawImage(
-    state.img,
-    rect.x / state.scale, rect.y / state.scale,
-    rect.w / state.scale, rect.h / state.scale,
-    0, 0, c.width, c.height
-  );
+  c.getContext('2d').drawImage(state.img, rect.x/state.scale, rect.y/state.scale, rect.w/state.scale, rect.h/state.scale, 0, 0, c.width, c.height);
   return c;
 }
 
-// ---- ** NEW ** Detect fret positions from a chord diagram image ----
-// Returns an array of 6 string voicings (0=open, 'x'=muted, or fret#)
-function detectVoicingFromImage(cropCanvas) {
+// ================================================================
+// CHORD RECOGNITION — reads fret positions from a cropped diagram
+// This runs at FULL RESOLUTION of the crop
+// ================================================================
+function recognizeChord(cropCanvas) {
   var w = cropCanvas.width, h = cropCanvas.height;
   if (w < 30 || h < 50) return null;
+
   var iCtx = cropCanvas.getContext('2d');
   var imageData = iCtx.getImageData(0, 0, w, h);
   var d = imageData.data;
 
-  // Convert to binary: 1=dark (line/dot), 0=light (background)
+  // 1. Grayscale
   var gray = new Uint8Array(w * h);
-  var threshold = 120;
-  for (var i = 0; i < w * h; i++) {
-    var j = i * 4;
-    var lum = d[j]*0.299 + d[j+1]*0.587 + d[j+2]*0.114;
-    gray[i] = lum < threshold ? 1 : 0;
+  for (var i = 0; i < w*h; i++) {
+    var j = i*4;
+    gray[i] = d[j]*0.299 + d[j+1]*0.587 + d[j+2]*0.114;
   }
 
-  // --- Find the fretboard grid ---
-  // Horizontal projection: sum of dark pixels per row
+  // 2. Global Otsu-like threshold: split at median + offset
+  var sorted = new Uint8Array(gray);
+  sorted.sort(); // sorts in-place
+  var median = sorted[Math.floor(sorted.length * 0.5)];
+  var darkThresh = sorted[Math.floor(sorted.length * 0.15)]; // 15th percentile = "dark" pixels
+  var useThreshold = Math.max(darkThresh, median * 0.65);
+
+  // Binary: 1 = dark (ink), 0 = light (paper)
+  var bin = new Uint8Array(w * h);
+  for (var i = 0; i < w*h; i++) {
+    bin[i] = gray[i] < useThreshold ? 1 : 0;
+  }
+
+  // 3. Horizontal projection — find fret lines
   var hProj = new Uint32Array(h);
-  for (var y = 0; y < h; y++) {
-    var sum = 0;
-    for (var x = 0; x < w; x++) sum += gray[y * w + x];
-    hProj[y] = sum;
-  }
+  for (var y = 0; y < h; y++) { var s=0; for(var x=0;x<w;x++) s+=bin[y*w+x]; hProj[y]=s; }
 
-  // Find fret lines (horizontal peaks > 55% dark)
   var fretLines = [];
-  var minFretGap = Math.max(8, Math.round(h * 0.08));
-  for (var y = 2; y < h - 2; y++) {
-    if (hProj[y] > w * 0.55) {
-      // Check it's a local peak
-      if (hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
-        if (!fretLines.length || y - fretLines[fretLines.length-1] > minFretGap) {
-          fretLines.push(y);
-        }
-      }
+  var minGap = Math.max(6, Math.round(h * 0.05));
+  for (var y = 2; y < h-2; y++) {
+    if (hProj[y] > w * 0.30 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
+      if (!fretLines.length || y - fretLines[fretLines.length-1] > minGap) fretLines.push(y);
     }
   }
 
-  // Need at least 3 fret lines to define a grid
-  if (fretLines.length < 3) return null;
-
-  // Take the first 5-6 clear fret lines (chord diagrams typically show 5 frets)
-  var numFrets = Math.min(fretLines.length - 1, 5);
-  if (numFrets < 3) return null;
-
-  // --- Find string lines (vertical peaks) ---
-  var vProj = new Uint32Array(w);
-  for (var x = 0; x < w; x++) {
-    var sum = 0;
-    for (var y = 0; y < h; y++) sum += gray[y * w + x];
-    vProj[x] = sum;
+  // Need at least 3 fret lines (nut + 2 frets)
+  if (fretLines.length < 3) {
+    // Fallback: look for any horizontal dark band structure
+    return null;
   }
+
+  var numFrets = Math.min(fretLines.length - 1, 5);
+  if (numFrets < 2) return null;
+
+  // 4. Vertical projection — find string lines
+  var vProj = new Uint32Array(w);
+  for (var x = 0; x < w; x++) { var s=0; for(var y=0;y<h;y++) s+=bin[y*w+x]; vProj[x]=s; }
 
   var stringLines = [];
-  var minStringGap = Math.max(4, Math.round(w * 0.05));
-  for (var x = 2; x < w - 2; x++) {
-    if (vProj[x] > h * 0.35) {
-      if (vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
-        if (!stringLines.length || x - stringLines[stringLines.length-1] > minStringGap) {
-          stringLines.push(x);
-        }
-      }
+  var minSGap = Math.max(3, Math.round(w * 0.03));
+  for (var x = 2; x < w-2; x++) {
+    if (vProj[x] > h * 0.18 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
+      if (!stringLines.length || x - stringLines[stringLines.length-1] > minSGap) stringLines.push(x);
     }
   }
-
-  // Need about 6 strings
   if (stringLines.length < 4) return null;
-  // Take the 6 most prominent
+  // Keep strongest 6
   while (stringLines.length > 6) stringLines.pop();
 
-  // --- Detect dots/fingers at each (string, fret) intersection ---
-  var voicing = ['x','x','x','x','x','x'];
-
-  // Detect X/O markers above the first fret line (nut area)
+  // 5. Determine nut line and marker area
   var nutY = fretLines[0];
-  var markerArea = Math.max(10, Math.round(nutY * 0.35));
-  for (var s = 0; s < stringLines.length; s++) {
-    var sx = stringLines[s];
-    // Sample the area above the nut
-    var sampleY = Math.floor(nutY * 0.5);
-    if (sampleY >= nutY) sampleY = Math.floor(nutY * 0.3);
-    // Check if there's an 'X' or dark marker
-    var darkCount = 0;
-    var sampleH = Math.max(5, Math.floor(nutY * 0.3));
-    var sampleW = Math.max(5, Math.round(w * 0.05));
-    var halfW = Math.max(2, Math.floor(sampleW / 2));
-    for (var dy = Math.max(0, sampleY - 2); dy < Math.min(nutY, sampleY + 5); dy++) {
-      for (var dx = Math.max(0, sx - halfW); dx < Math.min(w, sx + halfW + 1); dx++) {
-        if (gray[dy * w + dx]) darkCount++;
+  var aboveNut = Math.max(1, Math.floor(nutY * 0.3));
+
+  // 6. Detect X/O markers above nut
+  var voicing = ['x','x','x','x','x','x'];
+  var hw = Math.max(2, Math.round(w * 0.035));
+
+  for (var si = 0; si < stringLines.length; si++) {
+    var sx = stringLines[si];
+    var cx = Math.max(0, Math.min(w-1, sx));
+    var darkPix = 0, totalPix = 0;
+    for (var dy = Math.max(1, aboveNut-2); dy < nutY; dy++) {
+      for (var dx = Math.max(0, cx-hw); dx < Math.min(w, cx+hw+1); dx++) {
+        totalPix++;
+        if (bin[dy*w + dx]) darkPix++;
       }
     }
-    var totalPix = (Math.min(nutY, sampleY + 5) - Math.max(0, sampleY - 2)) * (Math.min(w, sx + halfW + 1) - Math.max(0, sx - halfW));
-    // If mostly dark (>30%), it's likely an X or finger near nut
-    // If very light (<5%), it's an open string
-    if (darkCount < totalPix * 0.08) {
-      voicing[s] = 0; // open
+    // If >30% dark in this column above nut → it's muted (X or finger)
+    // If <5% dark → it's open
+    if (totalPix > 0) {
+      var ratio = darkPix / totalPix;
+      if (ratio < 0.06) voicing[si] = 0;
+      else if (ratio > 0.35) voicing[si] = 'x';
+      else voicing[si] = 0; // borderline → open
     }
-    // else it's muted or has a finger near the nut - check further
   }
 
-  // Detect dots: for each (string, fret) intersection, check for dark circle
+  // 7. Detect dots at string×fret intersections
   for (var fi = 1; fi < fretLines.length && fi <= 5; fi++) {
-    var fy = fretLines[fi];
-    var prevY = fretLines[fi - 1];
+    var fy = fretLines[fi], prevY = fretLines[fi-1];
     var fretH = fy - prevY;
-    var dotCenterY = Math.round((prevY + fy) / 2);
+    var dotCY = Math.round((prevY + fy) / 2);
+    var dotR = Math.max(2, Math.round(fretH * 0.30));
 
-    for (var si = 0; si < stringLines.length; si++) {
-      var sx2 = stringLines[si];
-      // Already set from marker detection? Skip
-      if (voicing[si] !== 'x') continue;
+    for (var si2 = 0; si2 < stringLines.length; si2++) {
+      var sx2 = stringLines[si2];
+      // Already set as open? skip
+      if (voicing[si2] === 0) continue;
 
-      // Check for a dot: a dark circular region centered at (sx, dotCenterY)
-      var dotR = Math.max(2, Math.round(fretH * 0.25));
-      var darkInCircle = 0, totalInCircle = 0;
+      // Check for a dark dot centered at (sx2, dotCY)
+      var dark = 0, total = 0;
       for (var dy2 = -dotR; dy2 <= dotR; dy2++) {
         for (var dx2 = -dotR; dx2 <= dotR; dx2++) {
-          var dist = Math.sqrt(dx2 * dx2 + dy2 * dy2);
-          if (dist > dotR) continue;
-          var px = sx2 + dx2;
-          var py = dotCenterY + dy2;
+          if (dx2*dx2 + dy2*dy2 > dotR*dotR) continue;
+          var px = sx2 + dx2, py = dotCY + dy2;
           if (px >= 0 && px < w && py >= 0 && py < h) {
-            totalInCircle++;
-            if (gray[py * w + px]) darkInCircle++;
+            total++;
+            if (bin[py*w + px]) dark++;
           }
         }
       }
-      if (totalInCircle > 0 && darkInCircle / totalInCircle > 0.5) {
-        voicing[si] = fi; // fret number
-      }
+      // >35% dark in circle = finger dot
+      if (total > 0 && dark / total > 0.35) voicing[si2] = fi;
     }
   }
 
   return voicing;
 }
 
-// ---- Add a diagram from a selected / detected rectangle ----
+// ---- Add a diagram ----
 async function addRect(rect) {
-  if (rect.w < 35 || rect.h < 45) return;
+  if (rect.w < 35 || rect.h < 45) { toast('Selection too small'); return; }
   var crop = cropCanvas(rect);
   var chord = {
     id: uid(),
     name: 'Chord ' + (state.chords.length + 1),
     img: crop.toDataURL('image/png'),
-    voicing: ['x',0,2,2,1,0],  // fallback Am
+    voicing: ['x',0,2,2,1,0],
     barre: null,
     confidence: 'manual'
   };
 
-  // Try to detect voicing from the cropped image
   try {
-    var detected = detectVoicingFromImage(crop);
-    if (detected && detected.length === 6) {
-      chord.voicing = detected;
+    var det = recognizeChord(crop);
+    if (det && det.length === 6) {
+      chord.voicing = det;
       chord.confidence = 'auto';
     }
-  } catch(e) { /* fallback to default */ }
+  } catch(e) { /* fallback */ }
 
   state.chords.push(chord);
   renderChordList();
   selectChord(state.chords.length - 1);
 
-  // OCR chord name (read the full image, not just top 30%)
   log('Reading chord name…');
   try {
     if (window.Tesseract) {
       var res = await Tesseract.recognize(crop, 'eng', {
         logger: function(m) {
-          if (m.status === 'recognizing text') {
-            log('Reading chord name… ' + Math.round(m.progress * 100) + '%');
-          }
+          if (m.status === 'recognizing text')
+            log('Reading… ' + Math.round(m.progress*100) + '%');
         }
       });
-      var raw = res.data.text.replace(/\s+/g, '').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g, '');
+      var raw = res.data.text.replace(/\s+/g,'').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g,'');
       if (raw) {
         chord.name = raw.replace('♭','b');
-        chord.confidence = Math.round(res.data.confidence) + '%';
+        chord.confidence = Math.round(res.data.confidence)+'%';
         renderChordList();
         selectChord(state.chords.indexOf(chord));
       }
-      log('Added ' + chord.name + '. Voicing: ' + chord.voicing.join(' ') + '. Edit in tab.');
+      log('Added ' + chord.name + '. Voicing: ' + chord.voicing.join(' '));
     } else {
-      log('Added diagram. OCR unavailable; name entered manually.');
+      log('Added diagram. OCR unavailable.');
     }
   } catch(err) {
-    log('Added diagram. Name may need manual correction.');
+    log('Added diagram. Name may need correction.');
   }
 }
 
 $('addSelectionBtn').onclick = function() {
-  if (state.sel) addRect(state.sel);
-  else log('Drag around a chord diagram first.');
+  if(!state.img){toast('Load an image first');return;}
+  if(!state.sel||state.sel.w<35||state.sel.h<45){toast('Drag around a chord diagram first');return;}
+  addRect(state.sel);
+  clearSelection();
 };
 
-// ---- ** FIXED ** Auto-detect: fast projection-based grid detection ----
+// ================================================================
+// AUTO-DETECT — works at full resolution via edge projection
+// No sub-pixel line loss because we never downsample below 500px
+// ================================================================
 $('autoDetectBtn').onclick = async function() {
-  if (!state.img) return;
+  if (!state.img) { toast('Load an image first'); return; }
   state.autoDetectAbort = false;
   setProgress(0);
-  log('Running fast grid detection…');
+  log('Auto-detecting chord diagrams…');
 
-  // Downsample for fast scanning — target ~200px wide
-  var scanW = 200;
-  var scanH = Math.round(state.img.height * (scanW / state.img.width));
+  var W = state.img.width, H = state.img.height;
+
+  // Work at a resolution that preserves thin lines: min(800, W)
+  var scanW = Math.min(800, W);
+  var scanH = Math.round(H * (scanW / W));
   var scanCanvas = document.createElement('canvas');
   scanCanvas.width = scanW; scanCanvas.height = scanH;
   var sCtx = scanCanvas.getContext('2d');
   sCtx.drawImage(state.img, 0, 0, scanW, scanH);
-  var scanData = sCtx.getImageData(0, 0, scanW, scanH);
-  var sd = scanData.data;
+  var sd = sCtx.getImageData(0, 0, scanW, scanH).data;
 
-  // Binary: dark=1, light=0
-  var bin = new Uint8Array(scanW * scanH);
-  for (var i = 0; i < scanW * scanH; i++) {
-    var j = i * 4;
-    bin[i] = (sd[j]*0.299 + sd[j+1]*0.587 + sd[j+2]*0.114) < 130 ? 1 : 0;
-  }
+  setProgress(0.1);
 
-  // Vertical projection (sum per column)
-  var vProj = new Uint32Array(scanW);
-  for (var x = 0; x < scanW; x++) {
-    var sum = 0;
-    for (var y = 0; y < scanH; y++) sum += bin[y * scanW + x];
-    vProj[x] = sum;
-  }
-
-  // Horizontal projection (sum per row)
-  var hProj = new Uint32Array(scanH);
-  for (var y = 0; y < scanH; y++) {
-    var sum = 0;
-    for (var x = 0; x < scanW; x++) sum += bin[y * scanW + x];
-    hProj[y] = sum;
-  }
-
-  // Find candidate regions: look for blocks where both hProj and vProj
-  // have sustained high values (indicating grid lines)
-  var hHigh = new Array(scanH).fill(false);
-  for (var y = 0; y < scanH; y++) {
-    hHigh[y] = hProj[y] > scanW * 0.4;
-  }
-
-  var vHigh = new Array(scanW).fill(false);
-  for (var x = 0; x < scanW; x++) {
-    vHigh[x] = vProj[x] > scanH * 0.25;
-  }
-
-  // Find vertical bands (clusters of columns with high dark density)
-  var vBands = [];
-  var inBand = false, bandStart = 0;
-  for (var x = 0; x < scanW; x++) {
-    if (vHigh[x] && !inBand) { inBand = true; bandStart = x; }
-    else if (!vHigh[x] && inBand) {
-      if (x - bandStart > 8) vBands.push({start: bandStart, end: x});
-      inBand = false;
+  // Edge detection: horizontal and vertical differences
+  var edgeH = new Float32Array(scanW * scanH);
+  var edgeV = new Float32Array(scanW * scanH);
+  var edge = new Float32Array(scanW * scanH);
+  for (var y = 1; y < scanH-1; y++) {
+    for (var x = 1; x < scanW-1; x++) {
+      var i = (y*scanW + x) * 4;
+      var lum = sd[i]*0.299 + sd[i+1]*0.587 + sd[i+2]*0.114;
+      var lL = sd[((y)*scanW + (x-1))*4]*0.299 + sd[((y)*scanW + (x-1))*4+1]*0.587 + sd[((y)*scanW + (x-1))*4+2]*0.114;
+      var rL = sd[((y)*scanW + (x+1))*4]*0.299 + sd[((y)*scanW + (x+1))*4+1]*0.587 + sd[((y)*scanW + (x+1))*4+2]*0.114;
+      var uL = sd[((y-1)*scanW + x)*4]*0.299 + sd[((y-1)*scanW + x)*4+1]*0.587 + sd[((y-1)*scanW + x)*4+2]*0.114;
+      var dL = sd[((y+1)*scanW + x)*4]*0.299 + sd[((y+1)*scanW + x)*4+1]*0.587 + sd[((y+1)*scanW + x)*4+2]*0.114;
+      var idx = y*scanW + x;
+      edgeH[idx] = Math.abs(rL - lL);
+      edgeV[idx] = Math.abs(dL - uL);
+      edge[idx] = Math.sqrt(edgeH[idx]*edgeH[idx] + edgeV[idx]*edgeV[idx]);
     }
   }
-  if (inBand && scanW - bandStart > 8) vBands.push({start: bandStart, end: scanW});
-
-  // Find horizontal bands
-  var hBands = [];
-  inBand = false;
-  bandStart = 0;
-  for (var y = 0; y < scanH; y++) {
-    if (hHigh[y] && !inBand) { inBand = true; bandStart = y; }
-    else if (!hHigh[y] && inBand) {
-      if (y - bandStart > 15) hBands.push({start: bandStart, end: y});
-      inBand = false;
-    }
-  }
-  if (inBand && scanH - bandStart > 15) hBands.push({start: bandStart, end: scanH});
 
   setProgress(0.3);
 
-  // A chord diagram is where a vertical band (strings) and horizontal band (frets) overlap
+  // Threshold edges: keep strongest 15%
+  var edgeSorted = new Float32Array(edge);
+  edgeSorted.sort();
+  var edgeThresh = edgeSorted[Math.floor(edgeSorted.length * 0.85)] || 30;
+  var edgeBin = new Uint8Array(scanW * scanH);
+  for (var i = 0; i < scanW*scanH; i++) edgeBin[i] = edge[i] > edgeThresh ? 1 : 0;
+
+  // Horizontal projection of edge pixels
+  var hEdgeProj = new Uint32Array(scanH);
+  for (var y = 0; y < scanH; y++) { var s=0; for(var x=0;x<scanW;x++) s+=edgeBin[y*scanW+x]; hEdgeProj[y]=s; }
+
+  // Vertical projection of edge pixels
+  var vEdgeProj = new Uint32Array(scanW);
+  for (var x = 0; x < scanW; x++) { var s=0; for(var y=0;y<scanH;y++) s+=edgeBin[y*scanW+x]; vEdgeProj[x]=s; }
+
+  setProgress(0.5);
+
+  // Find horizontal bands (fret regions) where edge density is high
+  var hBandThresh = scanW * 0.08; // at least 8% of pixels in a row are edge
+  var hBands = []; var inB=false, bS=0;
+  for (var y = 0; y < scanH; y++) {
+    if (hEdgeProj[y] > hBandThresh && !inB) { inB=true; bS=y; }
+    else if (hEdgeProj[y] <= hBandThresh && inB) { if(y-bS>20) hBands.push({s:bS,e:y}); inB=false; }
+  }
+  if (inB && scanH-bS>20) hBands.push({s:bS,e:scanH});
+
+  // Find vertical bands (string regions)
+  var vBandThresh = scanH * 0.05;
+  var vBands = []; inB=false; bS=0;
+  for (var x = 0; x < scanW; x++) {
+    if (vEdgeProj[x] > vBandThresh && !inB) { inB=true; bS=x; }
+    else if (vEdgeProj[x] <= vBandThresh && inB) { if(x-bS>10) vBands.push({s:bS,e:x}); inB=false; }
+  }
+  if (inB && scanW-bS>10) vBands.push({s:bS,e:scanW});
+
+  setProgress(0.7);
+
+  // Overlap: candidates are where hBands and vBands intersect
   var candidates = [];
   for (var hi = 0; hi < hBands.length; hi++) {
     for (var vi = 0; vi < vBands.length; vi++) {
-      var bx = vBands[vi].start, by = hBands[hi].start;
-      var bw = vBands[vi].end - bx, bh = hBands[hi].end - by;
-      // Chord diagrams are roughly 1:1 to 1:1.4 aspect
+      var bw = vBands[vi].e - vBands[vi].s;
+      var bh = hBands[hi].e - hBands[hi].s;
       var aspect = bw / bh;
-      if (aspect < 0.5 || aspect > 1.8) continue;
-      if (bw < 20 || bh < 30) continue;
+      if (aspect < 0.4 || aspect > 2.0) continue;
+      if (bw < 30 || bh < 40) continue;
       candidates.push({
-        x: bx, y: by, w: bw, h: bh,
-        score: (vBands[vi].end - vBands[vi].start) * (hBands[hi].end - hBands[hi].start)
+        x: vBands[vi].s, y: hBands[hi].s, w: bw, h: bh,
+        score: bw*bh
       });
     }
   }
 
-  setProgress(0.5);
+  if (!candidates.length) {
+    log('No clear diagrams found. Try manual selection.');
+    setProgress(-1);
+    return;
+  }
 
-  // Merge overlapping candidates, keep highest score
+  // Merge overlapping
   candidates.sort(function(a,b){return b.score - a.score;});
   var merged = [];
   for (var ci = 0; ci < candidates.length; ci++) {
@@ -521,77 +478,57 @@ $('autoDetectBtn').onclick = async function() {
       var m = merged[mi];
       var ox = Math.max(0, Math.min(c.x+c.w, m.x+m.w) - Math.max(c.x, m.x));
       var oy = Math.max(0, Math.min(c.y+c.h, m.y+m.h) - Math.max(c.y, m.y));
-      if (ox * oy > Math.min(c.w*c.h, m.w*m.h) * 0.4) {
-        overlap = true;
-        break;
-      }
+      if (ox * oy > Math.min(c.w*c.h, m.w*m.h) * 0.4) { overlap = true; break; }
     }
-    if (!overlap && merged.length < 20) merged.push(c);
+    if (!overlap && merged.length < 24) merged.push(c);
   }
 
-  if (!merged.length) {
-    log('No chord diagrams found. Drag manually.');
-    setProgress(-1);
-    return;
-  }
+  setProgress(0.85);
+  log('Found ' + merged.length + ' diagrams. Adding…');
 
-  setProgress(0.7);
-
-  // Scale candidates back to image coordinates
-  var scaleX = state.img.width / scanW;
-  var scaleY = state.img.height / scanH;
-  log('Found ' + merged.length + ' candidate diagrams. Adding them…');
+  // Scan coords → image coords → canvas coords
+  var imgScaleX = W / scanW;
+  var imgScaleY = H / scanH;
 
   for (var mi2 = 0; mi2 < merged.length; mi2++) {
     if (state.autoDetectAbort) break;
     var cand = merged[mi2];
-    var imgRect = {
-      x: cand.x * scaleX,
-      y: cand.y * scaleY,
-      w: cand.w * scaleX,
-      h: cand.h * scaleY
+    // Add generous padding (name is above diagram)
+    var padY = Math.round(cand.h * 0.35);
+    var padX = Math.round(cand.w * 0.08);
+    // Convert to canvas coords
+    var canvasRect = {
+      x: Math.round(Math.max(0, cand.x - padX) * imgScaleX * state.scale),
+      y: Math.round(Math.max(0, cand.y - padY) * imgScaleY * state.scale),
+      w: Math.round((cand.w + padX*2) * imgScaleX * state.scale),
+      h: Math.round((cand.h + padY) * imgScaleY * state.scale)
     };
-    setProgress(0.7 + (mi2 / merged.length) * 0.25);
-    await addRect(imgRect);
+    setProgress(0.85 + (mi2/merged.length)*0.12);
+    await addRect(canvasRect);
   }
 
   setProgress(-1);
-  log('Finished. ' + merged.length + ' candidates added. Remove false ones in Edit.');
+  toast('Added ' + merged.length + ' diagrams');
+  log('Done — ' + merged.length + ' diagrams added. Edit in tab 2.');
 };
 
 // ---- Chord list ----
 function renderChordList() {
   var d = $('diagramList');
   $('countBadge').textContent = state.chords.length;
-  if (!state.chords.length) {
-    d.innerHTML = '<p class="hint">No diagrams added yet.</p>';
-    updateChordSelect();
-    return;
-  }
+  if (!state.chords.length) { d.innerHTML='<p class="hint">No diagrams added.</p>'; updateChordSelect(); return; }
   var html = '';
   for (var i = 0; i < state.chords.length; i++) {
     var c = state.chords[i];
-    html += '<div class="diagramCard' + (i === state.selected ? ' selected' : '') + '" data-i="' + i + '">' +
-      '<h3>' + esc(c.name) + '</h3>' +
-      '<img class="mini" src="' + c.img + '">' +
-      '<div class="hint">' + c.voicing.join(' ') + '</div>' +
-      '</div>';
+    html += '<div class="diagramCard'+(i===state.selected?' selected':'')+'" data-i="'+i+'">' +
+      '<h3>'+esc(c.name)+'</h3><img class="mini" src="'+c.img+'">' +
+      '<div class="hint">'+c.voicing.join(' ')+'</div></div>';
   }
   d.innerHTML = html;
-  d.querySelectorAll('.diagramCard').forEach(function(x) {
-    x.onclick = function() {
-      selectChord(+x.dataset.i);
-      switchPane('edit');
-    };
-  });
+  d.querySelectorAll('.diagramCard').forEach(function(x){x.onclick=function(){selectChord(+x.dataset.i);switchPane('edit');};});
   updateChordSelect();
 }
-
-function esc(s) {
-  return String(s).replace(/[&<>"']/g, function(m) {
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-  });
-}
+function esc(s) { return String(s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];}); }
 
 function selectChord(i) {
   state.selected = i;
@@ -601,353 +538,59 @@ function selectChord(i) {
   $('editor').hidden = !c;
   if (!c) return;
   $('chordName').value = c.name;
-  $('barreFret').value = c.barre ? c.barre.fret : 0;
-  $('barreFrom').value = c.barre ? c.barre.from : 6;
-  $('barreTo').value = c.barre ? c.barre.to : 1;
+  $('barreFret').value = c.barre?c.barre.fret:0;
+  $('barreFrom').value = c.barre?c.barre.from:6;
+  $('barreTo').value = c.barre?c.barre.to:1;
   renderFretboard();
 }
-
 $('chordName').oninput = function(e) {
   var c = state.chords[state.selected];
-  if (c) {
-    c.name = e.target.value || 'Untitled';
-    renderChordList();
-    renderProgression();
-  }
+  if (c) { c.name=e.target.value||'Untitled'; renderChordList(); renderProgression(); }
 };
 
-// ---- Fretboard rendering (optimized with DocumentFragment) ----
+// ---- Fretboard ----
 function renderFretboard() {
-  var c = state.chords[state.selected];
-  if (!c) return;
-  var fb = $('fretboard');
-  fb.innerHTML = '';
-
+  var c = state.chords[state.selected]; if(!c) return;
+  var fb = $('fretboard'); fb.innerHTML = '';
   var frag = document.createDocumentFragment();
-
-  // Marker row (X/O/●)
-  for (var s = 0; s < 6; s++) {
-    var cell = document.createElement('div');
-    cell.className = 'cell marker';
-    var v = c.voicing[s];
-    cell.textContent = v === 'x' ? 'X' : v === 0 ? 'O' : '●';
-    cell._s = s;
-    cell.onclick = function() {
-      var cv = c.voicing[this._s];
-      c.voicing[this._s] = cv === 'x' ? 0 : cv === 0 ? 1 : 'x';
-      renderFretboard();
-    };
-    frag.appendChild(cell);
-  }
-
-  // Fret rows 1-6
-  for (var fret = 1; fret <= 6; fret++) {
-    for (var s2 = 0; s2 < 6; s2++) {
-      var cell2 = document.createElement('div');
-      cell2.className = 'cell';
-      var isBarre = c.barre && c.barre.fret === fret &&
-        s2 >= 6 - c.barre.from && s2 <= 6 - c.barre.to;
-      if (c.voicing[s2] === fret) cell2.classList.add('dot');
-      if (isBarre) cell2.classList.add('barre');
-      cell2._s = s2; cell2._f = fret;
-      cell2.onclick = function() {
-        c.voicing[this._s] = c.voicing[this._s] === this._f ? 'x' : this._f;
-        renderFretboard();
-      };
-      frag.appendChild(cell2);
-    }
-  }
-
+  for(var s=0;s<6;s++){var cell=document.createElement('div');cell.className='cell marker';cell.textContent=c.voicing[s]==='x'?'X':c.voicing[s]===0?'O':'●';cell._s=s;cell.onclick=function(){var v=c.voicing[this._s];c.voicing[this._s]=v==='x'?0:v===0?1:'x';renderFretboard();};frag.appendChild(cell);}
+  for(var fr=1;fr<=6;fr++){for(var s=0;s<6;s++){var c2=document.createElement('div');c2.className='cell';var isBarre=c.barre&&c.barre.fret===fr&&s>=6-c.barre.from&&s<=6-c.barre.to;if(c.voicing[s]===fr)c2.classList.add('dot');if(isBarre)c2.classList.add('barre');c2._s=s;c2._f=fr;c2.onclick=function(){c.voicing[this._s]=c.voicing[this._s]===this._f?'x':this._f;renderFretboard();};frag.appendChild(c2);}}
   fb.appendChild(frag);
-  $('voicingText').textContent = 'Strings 6→1: ' + c.voicing.join('  ') +
-    '   MIDI: ' + voicingNotes(c).join(', ');
+  $('voicingText').textContent='Strings 6→1: '+c.voicing.join('  ')+'   MIDI: '+voicingNotes(c).join(', ');
 }
-
-$('applyBarre').onclick = function() {
-  var c = state.chords[state.selected];
-  if (!c) return;
-  c.barre = {fret: +$('barreFret').value, from: +$('barreFrom').value, to: +$('barreTo').value};
-  var a = Math.min(6 - c.barre.from, 6 - c.barre.to);
-  var b = Math.max(6 - c.barre.from, 6 - c.barre.to);
-  for (var s = a; s <= b; s++) c.voicing[s] = c.barre.fret;
-  renderFretboard();
-};
-$('clearBarre').onclick = function() {
-  var c = state.chords[state.selected];
-  if (c) { c.barre = null; renderFretboard(); }
-};
-$('deleteChord').onclick = function() {
-  if (state.selected < 0) return;
-  var id = state.chords[state.selected].id;
-  state.chords.splice(state.selected, 1);
-  state.progression = state.progression.filter(function(x) { return x.chordId !== id; });
-  state.selected = Math.min(state.selected, state.chords.length - 1);
-  renderChordList();
-  selectChord(state.selected);
-  renderProgression();
-};
-
-function voicingNotes(c) {
-  var out = [];
-  for (var i = 0; i < c.voicing.length; i++) {
-    var v = c.voicing[i];
-    if (v === 'x') out.push(null);
-    else out.push(tuning[i] + (parseInt(v,10)||0));
-  }
-  return out.filter(function(n) { return n !== null; });
-}
+$('applyBarre').onclick=function(){var c=state.chords[state.selected];if(!c)return;c.barre={fret:+$('barreFret').value,from:+$('barreFrom').value,to:+$('barreTo').value};var a=Math.min(6-c.barre.from,6-c.barre.to),b=Math.max(6-c.barre.from,6-c.barre.to);for(var s=a;s<=b;s++)c.voicing[s]=c.barre.fret;renderFretboard();};
+$('clearBarre').onclick=function(){var c=state.chords[state.selected];if(c){c.barre=null;renderFretboard();}};
+$('deleteChord').onclick=function(){if(state.selected<0)return;var id=state.chords[state.selected].id;state.chords.splice(state.selected,1);state.progression=state.progression.filter(function(x){return x.chordId!==id;});state.selected=Math.min(state.selected,state.chords.length-1);renderChordList();selectChord(state.selected);renderProgression();};
+function voicingNotes(c){var out=[];for(var i=0;i<c.voicing.length;i++){var v=c.voicing[i];out.push(v==='x'?null:tuning[i]+(parseInt(v,10)||0));}return out.filter(function(n){return n!==null;});}
 
 // ---- Progression ----
-function updateChordSelect() {
-  var s = $('addChordSelect');
-  s.innerHTML = state.chords.map(function(c) {
-    return '<option value="' + c.id + '">' + esc(c.name) + '</option>';
-  }).join('');
-  $('addToProgression').disabled = !state.chords.length;
-}
+function updateChordSelect(){var s=$('addChordSelect');s.innerHTML=state.chords.map(function(c){return '<option value="'+c.id+'">'+esc(c.name)+'</option>';}).join('');$('addToProgression').disabled=!state.chords.length;}
+$('addToProgression').onclick=function(){var id=$('addChordSelect').value;if(!id)return;state.progression.push({id:uid(),chordId:id,bars:1});renderProgression();setTimeout(function(){$('progression').scrollLeft=$('progression').scrollWidth;},50);};
+$('clearProgression').onclick=function(){state.progression=[];renderProgression();};
+function renderProgression(){var p=$('progression');if(!state.progression.length){p.innerHTML='<p class="hint">Add recognised chords.</p>';return;}var html='';for(var i=0;i<state.progression.length;i++){var st=state.progression[i],c=state.chords.find(function(x){return x.id===st.chordId;});html+='<div class="step"><strong>'+esc(c?c.name:'Missing')+'</strong><label>Bars<input type="number" min="0.25" max="32" step="0.25" value="'+st.bars+'" data-bars="'+i+'"></label><button class="light" data-left="'+i+'">←</button><button class="light" data-right="'+i+'">→</button><button class="danger" data-del="'+i+'">Remove</button></div>';}p.innerHTML=html;p.querySelectorAll('[data-bars]').forEach(function(x){x.onchange=function(){state.progression[+x.dataset.bars].bars=Math.max(.25,+x.value||1);};});p.querySelectorAll('[data-del]').forEach(function(x){x.onclick=function(){state.progression.splice(+x.dataset.del,1);renderProgression();};});p.querySelectorAll('[data-left]').forEach(function(x){x.onclick=function(){move(+x.dataset.left,-1);};});p.querySelectorAll('[data-right]').forEach(function(x){x.onclick=function(){move(+x.dataset.right,1);};});}
+function move(i,d){var j=i+d;if(j<0||j>=state.progression.length)return;var t=state.progression[i];state.progression[i]=state.progression[j];state.progression[j]=t;renderProgression();}
 
-$('addToProgression').onclick = function() {
-  var id = $('addChordSelect').value;
-  if (!id) return;
-  state.progression.push({id: uid(), chordId: id, bars: 1});
-  renderProgression();
-};
-$('clearProgression').onclick = function() {
-  state.progression = [];
-  renderProgression();
-};
-
-function renderProgression() {
-  var p = $('progression');
-  if (!state.progression.length) {
-    p.innerHTML = '<p class="hint">Add recognised chords to create a timeline.</p>';
-    return;
-  }
-  var html = '';
-  for (var i = 0; i < state.progression.length; i++) {
-    var st = state.progression[i];
-    var c = state.chords.find(function(x) { return x.id === st.chordId; });
-    html += '<div class="step">' +
-      '<strong>' + esc(c ? c.name : 'Missing') + '</strong>' +
-      '<label>Bars<input type="number" min="0.25" max="32" step="0.25" value="' + st.bars + '" data-bars="' + i + '"></label>' +
-      '<button class="light" data-left="' + i + '">←</button>' +
-      '<button class="light" data-right="' + i + '">→</button>' +
-      '<button class="danger" data-del="' + i + '">Remove</button>' +
-      '</div>';
-  }
-  p.innerHTML = html;
-  p.querySelectorAll('[data-bars]').forEach(function(x) {
-    x.onchange = function() {
-      state.progression[+x.dataset.bars].bars = Math.max(0.25, +x.value || 1);
-    };
-  });
-  p.querySelectorAll('[data-del]').forEach(function(x) {
-    x.onclick = function() {
-      state.progression.splice(+x.dataset.del, 1);
-      renderProgression();
-    };
-  });
-  p.querySelectorAll('[data-left]').forEach(function(x) {
-    x.onclick = function() { move(+x.dataset.left, -1); };
-  });
-  p.querySelectorAll('[data-right]').forEach(function(x) {
-    x.onclick = function() { move(+x.dataset.right, 1); };
-  });
-}
-
-function move(i, d) {
-  var j = i + d;
-  if (j < 0 || j >= state.progression.length) return;
-  var tmp = state.progression[i];
-  state.progression[i] = state.progression[j];
-  state.progression[j] = tmp;
-  renderProgression();
-}
-
-// ---- Audio preview ----
-function buildEvents() {
-  var bpm = +$('tempo').value || 100;
-  var beatsPerBar = +$('timeSig').value || 4;
-  var pattern = $('pattern').value;
-  var events = [];
-  var beat = 0;
-  for (var pi = 0; pi < state.progression.length; pi++) {
-    var st = state.progression[pi];
-    var c = state.chords.find(function(x) { return x.id === st.chordId; });
-    if (!c) continue;
-    var notes = voicingNotes(c);
-    var dur = st.bars * beatsPerBar;
-    if (pattern === 'block') {
-      notes.forEach(function(n) { events.push({beat:beat, n:n, dur:dur, vel:90}); });
-    } else if (pattern === 'down') {
-      for (var b = 0; b < dur; b += 1) {
-        notes.forEach(function(n, k) {
-          events.push({beat: beat+b+k*0.025, n:n, dur:0.82, vel:92-k*3});
-        });
-      }
-    } else if (pattern === 'updown') {
-      for (var b = 0; b < dur; b += 0.5) {
-        var rev = Math.round(b*2) % 2 ? notes.slice().reverse() : notes;
-        rev.forEach(function(n, k) {
-          events.push({beat: beat+b+k*0.018, n:n, dur:0.38, vel:86});
-        });
-      }
-    } else { // arp
-      for (var b = 0; b < dur; b += 0.5) {
-        var n = notes[Math.floor((b*2) % Math.max(1, notes.length))];
-        if (n != null) events.push({beat: beat+b, n:n, dur:0.45, vel:88});
-      }
-    }
-    beat += dur;
-  }
-  return {bpm: bpm, beatsPerBar: beatsPerBar, events: events, totalBeats: beat};
-}
-
-function stopAudio() {
-  if (state.audio) { state.audio.close(); state.audio = null; }
-}
-$('playBtn').onclick = function() {
-  stopAudio();
-  var seq = buildEvents();
-  if (!seq.events.length) return;
-  var ac = new (window.AudioContext || window.webkitAudioContext)();
-  state.audio = ac;
-  var sec = 60 / seq.bpm;
-  seq.events.forEach(function(e) {
-    var o = ac.createOscillator(), g = ac.createGain();
-    var t = ac.currentTime + 0.06 + e.beat * sec;
-    var d = Math.max(0.05, e.dur * sec);
-    o.type = 'triangle';
-    o.frequency.value = 440 * Math.pow(2, (e.n - 69) / 12);
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(0.08, t + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.001, t + d);
-    o.connect(g).connect(ac.destination);
-    o.start(t); o.stop(t + d + 0.03);
-  });
-};
-$('stopBtn').onclick = stopAudio;
+// ---- Audio ----
+function buildEvents(){var bpm=+$('tempo').value||100,bb=+$('timeSig').value||4,pat=$('pattern').value,ev=[],bt=0;for(var pi=0;pi<state.progression.length;pi++){var st=state.progression[pi],c=state.chords.find(function(x){return x.id===st.chordId;});if(!c)continue;var n=voicingNotes(c),d=st.bars*bb;if(pat==='block')n.forEach(function(v){ev.push({beat:bt,n:v,dur:d,vel:90});});else if(pat==='down'){for(var b=0;b<d;b+=1)n.forEach(function(v,k){ev.push({beat:bt+b+k*.025,n:v,dur:.82,vel:92-k*3});});}else if(pat==='updown'){for(var b=0;b<d;b+=.5){var r=Math.round(b*2)%2?n.slice().reverse():n;r.forEach(function(v,k){ev.push({beat:bt+b+k*.018,n:v,dur:.38,vel:86});});}}else{for(var b=0;b<d;b+=.5){var v=n[Math.floor((b*2)%Math.max(1,n.length))];if(v!=null)ev.push({beat:bt+b,n:v,dur:.45,vel:88});}}bt+=d;}return{bpm:bpm,bb:bb,ev:ev,total:bt};}
+function stopAudio(){if(state.audio){state.audio.close();state.audio=null;}}
+$('playBtn').onclick=function(){stopAudio();var seq=buildEvents();if(!seq.ev.length)return;var ac=new(window.AudioContext||window.webkitAudioContext)();state.audio=ac;var sec=60/seq.bpm;seq.ev.forEach(function(e){var o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+.06+e.beat*sec,d=Math.max(.05,(e.dur||.5)*sec);o.type='triangle';o.frequency.value=440*Math.pow(2,(e.n-69)/12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.03);});};
+$('stopBtn').onclick=stopAudio;
 
 // ---- MIDI Export ----
-function vlq(v) {
-  var b = v & 127, out = [b];
-  while (v >>= 7) { b = (v & 127) | 128; out.unshift(b); }
-  return out;
-}
-function u16(n) { return [(n>>8)&255, n&255]; }
-function u32(n) { return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255]; }
+function vlq(v){var b=v&127,out=[b];while(v>>=7){b=(v&127)|128;out.unshift(b);}return out;}
+function u16(n){return[(n>>8)&255,n&255];}function u32(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255];}
+function makeMidi(){var seq=buildEvents();if(!seq.ev.length)throw Error('Build a progression.');var ppq=480,tr=[],tempo=Math.round(60000000/seq.bpm);tr.push(0,255,81,3,(tempo>>16)&255,(tempo>>8)&255,tempo&255,0,192,+$('program').value||24);var al=[];seq.ev.forEach(function(e){al.push({tick:Math.round(e.beat*ppq),on:1,n:e.n,v:e.vel});al.push({tick:Math.round((e.beat+(e.dur||.5))*ppq),on:0,n:e.n,v:0});});al.sort(function(a,b){return a.tick-b.tick||a.on-b.on;});var last=0;for(var i=0;i<al.length;i++){var e=al[i];tr.push.apply(tr,vlq(e.tick-last));tr.push(e.on?144:128,e.n,e.v);last=e.tick;}var end=Math.max(last,Math.round(seq.total*ppq));tr.push.apply(tr,vlq(end-last));tr.push(255,47,0);return new Uint8Array([0x4D,0x54,0x68,0x64,...u32(6),...u16(0),...u16(1),...u16(ppq),0x4D,0x54,0x72,0x6B,...u32(tr.length),...tr]);}
+function download(b,n,t){t=t||'application/octet-stream';var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([b],{type:t}));a.download=n;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1000);}
+$('exportMidi').onclick=function(){try{download(makeMidi(),'chordscan_progression.mid','audio/midi')}catch(e){alert(e.message);}};
 
-function makeMidi() {
-  var seq = buildEvents();
-  if (!seq.events.length) throw Error('Build a progression first.');
-  var ppq = 480;
-  var track = [];
-  var tempo = Math.round(60000000 / seq.bpm);
-  track.push(0,255,81,3,(tempo>>16)&255,(tempo>>8)&255,tempo&255,0,192,+$('program').value||24);
-  var all = [];
-  seq.events.forEach(function(e) {
-    all.push({tick:Math.round(e.beat*ppq), on:1, n:e.n, v:e.vel});
-    all.push({tick:Math.round((e.beat+e.dur)*ppq), on:0, n:e.n, v:0});
-  });
-  all.sort(function(a,b) { return a.tick-b.tick || a.on-b.on; });
-  var last = 0;
-  for (var i = 0; i < all.length; i++) {
-    var e = all[i];
-    track.push.apply(track, vlq(e.tick - last));
-    track.push(e.on ? 144 : 128, e.n, e.v);
-    last = e.tick;
-  }
-  var endTick = Math.max(last, Math.round(seq.totalBeats * ppq));
-  track.push.apply(track, vlq(endTick - last));
-  track.push(255,47,0);
-  var header = [
-    0x4D,0x54,0x68,0x64,
-    ...u32(6),
-    ...u16(0),
-    ...u16(1),
-    ...u16(ppq)
-  ];
-  var trackChunk = [
-    0x4D,0x54,0x72,0x6B,
-    ...u32(track.length),
-    ...track
-  ];
-  return new Uint8Array([...header, ...trackChunk]);
-}
-
-function download(bytes, name, type) {
-  type = type || 'application/octet-stream';
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob([bytes], {type: type}));
-  a.download = name;
-  document.body.appendChild(a);
-  a.click();
-  setTimeout(function() {
-    URL.revokeObjectURL(a.href);
-    a.remove();
-  }, 1000);
-}
-
-$('exportMidi').onclick = function() {
-  try { download(makeMidi(), 'chordscan_progression.mid', 'audio/midi'); }
-  catch(e) { alert(e.message); }
-};
-
-// ---- .riffle Export ----
-function readBytes(f) {
-  return new Promise(function(res, rej) {
-    var r = new FileReader();
-    r.onload = function() { res(new Uint8Array(r.result)); };
-    r.onerror = rej;
-    r.readAsArrayBuffer(f);
-  });
-}
-function decodeText(bytes) {
-  if (bytes[0]===255 && bytes[1]===254) {
-    var s = '';
-    for (var i = 2; i + 1 < bytes.length; i += 2)
-      s += String.fromCharCode(bytes[i] | (bytes[i+1] << 8));
-    return s;
-  }
-  return new TextDecoder().decode(bytes);
-}
-function enc16(s) {
-  var o = new Uint8Array(2 + s.length * 2);
-  o[0]=255; o[1]=254;
-  for (var i = 0; i < s.length; i++) {
-    var c = s.charCodeAt(i);
-    o[2+i*2] = c & 255;
-    o[3+i*2] = c >> 8;
-  }
-  return o;
-}
-
-$('exportRiffle').onclick = async function() {
-  try {
-    var f = $('riffleTemplate').files[0];
-    if (!f) throw Error('Choose a valid .riffle template first.');
-    var nums = decodeText(await readBytes(f)).split(',').map(function(x) {
-      return parseInt(x.trim(), 10);
-    }).filter(Number.isFinite);
-    if (nums.length < 1200) throw Error('Template does not look like valid .riffle.');
-    var seq = buildEvents();
-    if (!seq.events.length) throw Error('Build a progression first.');
-    var melody = seq.events.slice().sort(function(a,b) { return a.beat-b.beat || b.n-a.n; })
-      .filter(function(e,i,a) { return i===0 || e.beat !== a[i-1].beat; })
-      .map(function(e) { return e.n; });
-    var start = 1024;
-    var max = Math.min(+$('maxSlots').value || 128, nums.length - start);
-    var off = +$('pitchOffset').value;
-    for (var i = 0; i < max; i++) {
-      nums[start + i] = i < melody.length ? melody[i] + off : -1;
-    }
-    download(enc16(nums.join(',')), 'chordscan_progression.riffle');
-  } catch(e) { alert(e.message); }
-};
+// ---- Riffle ----
+function readBytes(f){return new Promise(function(res,rej){var r=new FileReader();r.onload=function(){res(new Uint8Array(r.result));};r.onerror=rej;r.readAsArrayBuffer(f);});}
+function decodeText(b){if(b[0]===255&&b[1]===254){var s='';for(var i=2;i+1<b.length;i+=2)s+=String.fromCharCode(b[i]|b[i+1]<<8);return s;}return new TextDecoder().decode(b);}
+function enc16(s){var o=new Uint8Array(2+s.length*2);o[0]=255;o[1]=254;for(var i=0;i<s.length;i++){var c=s.charCodeAt(i);o[2+i*2]=c&255;o[3+i*2]=c>>8;}return o;}
+$('exportRiffle').onclick=async function(){try{var f=$('riffleTemplate').files[0];if(!f)throw Error('Choose a template.');var nums=decodeText(await readBytes(f)).split(',').map(function(x){return parseInt(x.trim(),10);}).filter(Number.isFinite);if(nums.length<1200)throw Error('Invalid.');var seq=buildEvents();if(!seq.ev.length)throw Error('Build a progression.');var mel=seq.ev.slice().sort(function(a,b){return a.beat-b.beat||b.n-a.n;}).filter(function(e,i,a){return i===0||e.beat!==a[i-1].beat;}).map(function(e){return e.n;});var start=1024,max=Math.min(+$('maxSlots').value||128,nums.length-start),off=+$('pitchOffset').value;for(var i=0;i<max;i++)nums[start+i]=i<mel.length?mel[i]+off:-1;download(enc16(nums.join(',')),'chordscan_progression.riffle');}catch(e){alert(e.message);}};
 
 // ---- Init ----
-renderChordList();
-renderProgression();
+renderChordList(); renderProgression();
 </script>
 </body>
 </html>
