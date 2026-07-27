@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-<title>ChordScan Studio v1.1</title>
+<title>ChordScan Studio v1.2</title>
 <style>
 :root{--bg:#f6f2e9;--card:#fff;--ink:#17231c;--muted:#687269;--line:#d9d0c2;--green:#2f4f3e;--sage:#7a8f7b;--cream:#f4f1ea;--danger:#9d3b35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);overflow-x:hidden}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none;-webkit-overflow-scrolling:auto}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair;touch-action:none;-webkit-user-select:none;user-select:none}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none;z-index:10}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;cursor:pointer;transition:all .15s}.diagramCard:active{transform:scale(.97)}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none;cursor:pointer}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px;transition:background .1s}.cell.marker:active{background:#ddd}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px;scroll-snap-type:x mandatory}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff;flex-shrink:0;scroll-snap-align:start}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}#progressBar{height:4px;background:var(--line);border-radius:2px;overflow:hidden;margin:4px 0;display:none}#progressFill{height:100%;width:0%;background:var(--sage);transition:width .15s ease}#toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:#17231c;color:#fff;padding:8px 16px;border-radius:24px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:99}#toast.show{opacity:1}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
 </style>
 </head>
 <body>
-<header><h1>ChordScan Studio v1.1</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
+<header><h1>ChordScan Studio v1.2</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
 <div class="wrap">
   <div class="tabbar">
     <button class="active" data-pane="scan">1. Scan</button>
@@ -29,7 +29,7 @@
         </div>
         <input id="imageFile" type="file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <input id="cameraFile" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-        <p class="hint" style="margin:8px 0 0">Tip: Drag a box around <b>one single chord diagram</b> at a time, or use Auto-detect to slice them automatically.</p>
+        <p class="hint" style="margin:8px 0 0">For best results, select <b>one diagram plus its name</b>. Auto-detect now segments each row separately and rejects low-confidence crops.</p>
         <div class="row" style="margin-top:10px">
           <button id="autoDetectBtn" disabled>Auto-detect diagrams</button>
           <button class="secondary" id="addSelectionBtn" disabled>Add selected area</button>
@@ -85,7 +85,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ================================================================
-// ChordScan Studio v1.1 — Auto-Grid Slicer & Robust Fret Recognition
+// ChordScan Studio v1.2 — Auto-Grid Slicer & Robust Fret Recognition
 // ================================================================
 
 var $ = function(id) { return document.getElementById(id); };
@@ -186,99 +186,123 @@ function cropCanvas(rect, subRect) {
 // ================================================================
 // ROBUST CHORD VOICING RECOGNITION (Tested against standard grids)
 // ================================================================
+function otsuThreshold(gray) {
+  var hist = new Uint32Array(256), total = gray.length;
+  for (var i=0;i<total;i++) hist[gray[i]]++;
+  var sum=0; for(i=0;i<256;i++) sum += i*hist[i];
+  var sumB=0,wB=0,maxV=-1,thr=127;
+  for(i=0;i<256;i++){
+    wB += hist[i]; if(!wB) continue;
+    var wF=total-wB; if(!wF) break;
+    sumB += i*hist[i];
+    var mB=sumB/wB,mF=(sum-sumB)/wF;
+    var v=wB*wF*(mB-mF)*(mB-mF);
+    if(v>maxV){maxV=v;thr=i;}
+  }
+  return thr;
+}
+function clusterPeaks(proj, minValue, minGap) {
+  var out=[], inRun=false, s=0, best=0, bestV=0;
+  for(var i=0;i<proj.length;i++){
+    if(proj[i]>=minValue){
+      if(!inRun){inRun=true;s=i;best=i;bestV=proj[i];}
+      if(proj[i]>bestV){bestV=proj[i];best=i;}
+    } else if(inRun){
+      out.push(best); inRun=false;
+    }
+  }
+  if(inRun) out.push(best);
+  var merged=[];
+  out.forEach(function(v){
+    if(!merged.length || v-merged[merged.length-1]>=minGap) merged.push(v);
+    else if(proj[v]>proj[merged[merged.length-1]]) merged[merged.length-1]=v;
+  });
+  return merged;
+}
+function chooseEvenSix(peaks, proj, width) {
+  if(peaks.length<6) return null;
+  var best=null,bestScore=1e99;
+  for(var a=0;a<=peaks.length-6;a++){
+    var q=peaks.slice(a,a+6), gaps=[];
+    for(var i=1;i<6;i++) gaps.push(q[i]-q[i-1]);
+    var mean=gaps.reduce(function(x,y){return x+y;},0)/5;
+    if(mean<width*0.035 || mean>width*0.28) continue;
+    var variance=gaps.reduce(function(x,y){return x+(y-mean)*(y-mean);},0)/5;
+    var strength=q.reduce(function(x,y){return x+proj[y];},0);
+    var score=variance/(mean*mean+1)-strength*0.0005;
+    if(score<bestScore){bestScore=score;best=q;}
+  }
+  return best;
+}
 function recognizeChord(cropCanvas) {
-  var w = cropCanvas.width, h = cropCanvas.height;
-  if (w < 30 || h < 40) return null;
+  var w=cropCanvas.width,h=cropCanvas.height;
+  if(w<45||h<55) return null;
+  var data=cropCanvas.getContext('2d').getImageData(0,0,w,h).data;
+  var gray=new Uint8Array(w*h), mean=0;
+  for(var i=0;i<w*h;i++){var j=i*4;gray[i]=Math.round(data[j]*.299+data[j+1]*.587+data[j+2]*.114);mean+=gray[i];}
+  mean/=gray.length;
+  var thr=otsuThreshold(gray);
+  // Auto-polarity: foreground is the minority side of the threshold.
+  var low=0; for(i=0;i<gray.length;i++) if(gray[i]<thr) low++;
+  var darkForeground = low < gray.length/2;
+  var bin=new Uint8Array(w*h);
+  for(i=0;i<gray.length;i++) bin[i]=darkForeground?(gray[i]<thr?1:0):(gray[i]>thr?1:0);
 
-  var iCtx = cropCanvas.getContext('2d');
-  var imgData = iCtx.getImageData(0, 0, w, h);
-  var d = imgData.data;
+  // Ignore the title area when locating the grid.
+  var y0=Math.floor(h*.16), y1=h-1;
+  var vProj=new Uint32Array(w), hProj=new Uint32Array(h);
+  for(var y=y0;y<=y1;y++) for(var x=0;x<w;x++) if(bin[y*w+x]){vProj[x]++;hProj[y]++;}
+  var vPeaks=clusterPeaks(vProj,Math.max(4,(y1-y0)*.30),Math.max(2,Math.round(w*.018)));
+  var strings=chooseEvenSix(vPeaks,vProj,w);
+  if(!strings) return null;
+  var left=strings[0],right=strings[5],span=right-left;
+  if(span<w*.20) return null;
 
-  // Grayscale & dark threshold
-  var gray = new Uint8Array(w * h);
-  for (var i = 0; i < w*h; i++) {
-    var j = i*4;
-    gray[i] = d[j]*0.299 + d[j+1]*0.587 + d[j+2]*0.114;
+  // Rebuild horizontal projection only across the six strings.
+  hProj=new Uint32Array(h);
+  var xPad=Math.max(2,Math.round(span*.05));
+  for(y=y0;y<h;y++) for(x=Math.max(0,left-xPad);x<=Math.min(w-1,right+xPad);x++) if(bin[y*w+x]) hProj[y]++;
+  var hPeaks=clusterPeaks(hProj,Math.max(4,span*.55),Math.max(3,Math.round(h*.025)));
+  if(hPeaks.length<4) return null;
+  // Keep the strongest approximately-even run of 4–7 fret lines.
+  var frets=null,best=1e99;
+  for(var n=4;n<=Math.min(7,hPeaks.length);n++) for(var a=0;a<=hPeaks.length-n;a++){
+    var q=hPeaks.slice(a,a+n),g=[];for(i=1;i<n;i++)g.push(q[i]-q[i-1]);
+    var m=g.reduce(function(u,v){return u+v;},0)/g.length;
+    if(m<h*.035||m>h*.22)continue;
+    var vv=g.reduce(function(u,v){return u+(v-m)*(v-m);},0)/g.length;
+    var sc=vv/(m*m+1);
+    if(sc<best){best=sc;frets=q;}
   }
-  var sorted = new Uint8Array(gray); sorted.sort();
-  var darkThresh = sorted[Math.floor(sorted.length * 0.18)];
-  var bin = new Uint8Array(w * h);
-  for (var i = 0; i < w*h; i++) bin[i] = gray[i] < darkThresh ? 1 : 0;
+  if(!frets||frets.length<4) return null;
 
-  // Horizontal projection
-  var hProj = new Uint32Array(h);
-  for (var y = 0; y < h; y++) { var s=0; for(var x=0;x<w;x++) s+=bin[y*w+x]; hProj[y]=s; }
-
-  var fretLines = [];
-  var minGap = Math.max(6, Math.round(h * 0.06));
-  for (var y = 2; y < h-2; y++) {
-    if (hProj[y] > w * 0.25 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
-      if (!fretLines.length || y - fretLines[fretLines.length-1] > minGap) fretLines.push(y);
-    }
+  var voicing=['x','x','x','x','x','x'];
+  var nutY=frets[0], gapX=(strings[5]-strings[0])/5;
+  // Header markers: open circles are outline-heavy; X markers have diagonal ink.
+  for(var si=0;si<6;si++){
+    var sx=strings[si], top=Math.max(0,nutY-Math.round((frets[1]-frets[0])*.9)), bot=Math.max(top+2,nutY-2);
+    var cnt=0,total=0,rad=Math.max(2,Math.round(gapX*.22));
+    for(y=top;y<bot;y++)for(x=Math.max(0,sx-rad);x<=Math.min(w-1,sx+rad);x++){total++;if(bin[y*w+x])cnt++;}
+    voicing[si]=(cnt/Math.max(1,total))>.06?'x':0;
   }
-  if (fretLines.length < 3) return ['x',0,2,2,1,0]; // sensible fallback (Am)
-
-  // Vertical projection
-  var vProj = new Uint32Array(w);
-  for (var x = 0; x < w; x++) { var s=0; for(var y=0;y<h;y++) s+=bin[y*w+x]; vProj[x]=s; }
-
-  var stringLines = [];
-  var minSGap = Math.max(3, Math.round(w * 0.03));
-  for (var x = 2; x < w-2; x++) {
-    if (vProj[x] > h * 0.15 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
-      if (!stringLines.length || x - stringLines[stringLines.length-1] > minSGap) stringLines.push(x);
-    }
-  }
-  if (stringLines.length < 5) return ['x',0,2,2,1,0];
-  while (stringLines.length > 6) stringLines.shift();
-
-  var nutY = fretLines[0];
-  var voicing = ['x','x','x','x','x','x'];
-
-  // Check X / O markers in header area (above first fret line)
-  for (var si = 0; si < stringLines.length; si++) {
-    var sx = stringLines[si];
-    var topY = Math.max(0, Math.floor(nutY * 0.1));
-    var botY = Math.max(topY+2, nutY - 2);
-    var dark = 0, total = 0;
-    var hw = Math.max(2, Math.round((stringLines[1]-stringLines[0])*0.2 || w*0.03));
-    for (var dy = topY; dy < botY; dy++) {
-      for (var dx = Math.max(0, sx-hw); dx <= Math.min(w-1, sx+hw); dx++) {
-        total++;
-        if (bin[dy*w + dx]) dark++;
+  // Dots: compare a circular centre patch with a surrounding ring, making it robust to grid lines.
+  var maxF=Math.min(6,frets.length-1);
+  for(var fi=1;fi<=maxF;fi++){
+    var topF=frets[fi-1],botF=frets[fi],cy=Math.round((topF+botF)/2),fh=botF-topF;
+    var r=Math.max(2,Math.round(Math.min(gapX,fh)*.23));
+    for(si=0;si<6;si++){
+      sx=strings[si]; var inner=0,innerN=0,ring=0,ringN=0;
+      for(var dy=-r*2;dy<=r*2;dy++)for(var dx=-r*2;dx<=r*2;dx++){
+        var rr=dx*dx+dy*dy,px=sx+dx,py=cy+dy;if(px<0||px>=w||py<0||py>=h)continue;
+        if(rr<=r*r){innerN++;inner+=bin[py*w+px];}
+        else if(rr<=4*r*r){ringN++;ring+=bin[py*w+px];}
       }
-    }
-    if (total > 0) {
-      voicing[si] = (dark / total) < 0.08 ? 0 : 'x';
-    }
-  }
-
-  // Detect dots inside fret boxes
-  for (var fi = 1; fi < fretLines.length && fi <= 5; fi++) {
-    var topF = fretLines[fi-1], botF = fretLines[fi];
-    var fretH = botF - topF;
-    var centerY = Math.round((topF + botF) / 2);
-    var radius = Math.max(2, Math.round(fretH * 0.25));
-
-    for (var si2 = 0; si2 < stringLines.length; si2++) {
-      var sx2 = stringLines[si2];
-      var dotDark = 0, dotTotal = 0;
-      for (var dy2 = -radius; dy2 <= radius; dy2++) {
-        for (var dx2 = -radius; dx2 <= radius; dx2++) {
-          if (dx2*dx2 + dy2*dy2 > radius*radius) continue;
-          var px = sx2 + dx2, py = centerY + dy2;
-          if (px >= 0 && px < w && py >= 0 && py < h) {
-            dotTotal++;
-            if (bin[py*w + px]) dotDark++;
-          }
-        }
-      }
-      if (dotTotal > 0 && (dotDark / dotTotal) > 0.40) {
-        voicing[si2] = fi;
-      }
+      var inD=inner/Math.max(1,innerN), ringD=ring/Math.max(1,ringN);
+      if(inD>Math.max(.28,ringD+.10)) voicing[si]=fi;
     }
   }
-
+  var fretted=voicing.filter(function(v){return typeof v==='number'&&v>0;}).length;
+  if(!fretted) return null;
   return voicing;
 }
 
@@ -290,7 +314,7 @@ async function addRect(rect, customName) {
     id: uid(),
     name: customName || ('Chord ' + (state.chords.length + 1)),
     img: crop.toDataURL('image/png'),
-    voicing: ['x',0,2,2,1,0],
+    voicing: ['x','x','x','x','x','x'],
     barre: null,
     confidence: 'manual'
   };
@@ -318,9 +342,10 @@ async function addRect(rect, customName) {
           if (m.status === 'recognizing text') log('Reading name… ' + Math.round(m.progress*100) + '%');
         }
       });
-      var raw = res.data.text.replace(/\s+/g,'').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g,'');
-      if (raw && raw.length <= 7 && raw.length > 0) {
-        chord.name = raw.replace('♭','b');
+      var raw = res.data.text.replace(/\s+/g,'').replace(/♭/g,'b').replace(/[^A-Ga-g#b0-9mMajsud+\/()°ø-]/g,'');
+      var match = raw.match(/(?:[A-G](?:#|b)?)(?:maj|min|m|sus|dim|aug|add|M)?(?:2|4|5|6|7|9|11|13)?(?:\/[A-G](?:#|b)?)?/i);
+      if (match && match[0].length <= 12 && res.data.confidence >= 25) {
+        chord.name = match[0];
         chord.confidence = Math.round(res.data.confidence)+'%';
         renderChordList();
         selectChord(state.chords.indexOf(chord));
@@ -346,120 +371,67 @@ $('addSelectionBtn').onclick = function() {
 // If you select a grid of multiple chords, this slices them out!
 // ================================================================
 $('autoDetectBtn').onclick = async function() {
-  if (!state.img) { toast('Load an image first'); return; }
-  state.autoDetectAbort = false;
-  setProgress(0);
-  log('Auto-detecting chord diagrams…');
-
-  var W = state.img.width, H = state.img.height;
-  var scanW = Math.min(1000, W);
-  var scanH = Math.round(H * (scanW / W));
-  var scanCanvas = document.createElement('canvas');
-  scanCanvas.width = scanW; scanCanvas.height = scanH;
-  var sCtx = scanCanvas.getContext('2d');
-  sCtx.drawImage(state.img, 0, 0, scanW, scanH);
-  var sd = sCtx.getImageData(0, 0, scanW, scanH).data;
-
-  setProgress(0.2);
-
-  // Simple horizontal & vertical edge detection
-  var edge = new Float32Array(scanW * scanH);
-  for (var y = 1; y < scanH-1; y++) {
-    for (var x = 1; x < scanW-1; x++) {
-      var i = (y*scanW + x) * 4;
-      var lL = sd[((y)*scanW + (x-1))*4]*0.299;
-      var rL = sd[((y)*scanW + (x+1))*4]*0.299;
-      var uL = sd[((y-1)*scanW + x)*4]*0.299;
-      var dL = sd[((y+1)*scanW + x)*4]*0.299;
-      edge[y*scanW + x] = Math.abs(rL - lL) + Math.abs(dL - uL);
+  if(!state.img){toast('Load an image first');return;}
+  setProgress(0); log('Analysing rows and diagram spacing…');
+  var W=state.img.width,H=state.img.height,maxW=Math.min(1200,W),scale=maxW/W,SW=maxW,SH=Math.round(H*scale);
+  var c=document.createElement('canvas');c.width=SW;c.height=SH;var cx=c.getContext('2d');cx.drawImage(state.img,0,0,SW,SH);
+  var dat=cx.getImageData(0,0,SW,SH).data,gray=new Uint8Array(SW*SH);
+  for(var i=0;i<gray.length;i++){var j=i*4;gray[i]=Math.round(dat[j]*.299+dat[j+1]*.587+dat[j+2]*.114);}
+  var th=otsuThreshold(gray),low=0;for(i=0;i<gray.length;i++)if(gray[i]<th)low++;
+  var darkFg=low<gray.length/2,bin=new Uint8Array(gray.length);
+  for(i=0;i<gray.length;i++)bin[i]=darkFg?(gray[i]<th?1:0):(gray[i]>th?1:0);
+  setProgress(.2);
+  // Smoothed row activity; large blank gaps split rows.
+  var hp=new Float32Array(SH);
+  for(var y=0;y<SH;y++){var n=0;for(var x=0;x<SW;x++)n+=bin[y*SW+x];hp[y]=n/SW;}
+  var smooth=function(arr,r){var o=new Float32Array(arr.length),sum=0;for(var k=0;k<arr.length;k++){sum+=arr[k];if(k-r-1>=0)sum-=arr[k-r-1];o[k]=sum/Math.min(k+1,r+1);}return o;};
+  hp=smooth(hp,Math.max(3,Math.round(SH*.012)));
+  var active=[];var rs=-1,rowThr=.018;
+  for(y=0;y<SH;y++){
+    if(hp[y]>rowThr&&rs<0)rs=y;
+    if((hp[y]<=rowThr||y===SH-1)&&rs>=0){var re=y;if(re-rs>SH*.08)active.push({s:Math.max(0,rs-Math.round(SH*.02)),e:Math.min(SH,re+Math.round(SH*.02))});rs=-1;}
+  }
+  // Merge nearby bands belonging to title+grid in the same row.
+  var rows=[];active.forEach(function(r){if(rows.length&&r.s-rows[rows.length-1].e<SH*.05)rows[rows.length-1].e=r.e;else rows.push(r);});
+  rows=rows.filter(function(r){return r.e-r.s>SH*.12;});
+  setProgress(.45);
+  var rects=[];
+  rows.forEach(function(row){
+    var vp=new Float32Array(SW),rh=row.e-row.s;
+    for(var x=0;x<SW;x++){var n=0;for(var yy=row.s;yy<row.e;yy++)n+=bin[yy*SW+x];vp[x]=n/rh;}
+    vp=smooth(vp,Math.max(2,Math.round(SW*.006)));
+    var bands=[],bs=-1,thr=.035;
+    for(x=0;x<SW;x++){
+      if(vp[x]>thr&&bs<0)bs=x;
+      if((vp[x]<=thr||x===SW-1)&&bs>=0){var be=x;if(be-bs>SW*.025)bands.push({s:bs,e:be});bs=-1;}
     }
+    // Merge name and grid fragments when close; then split abnormally wide bands by estimated diagram width.
+    var merged=[];bands.forEach(function(b){if(merged.length&&b.s-merged[merged.length-1].e<SW*.018)merged[merged.length-1].e=b.e;else merged.push(b);});
+    var widths=merged.map(function(b){return b.e-b.s;}).filter(function(v){return v>SW*.035&&v<SW*.22;}).sort(function(a,b){return a-b;});
+    var med=widths.length?widths[Math.floor(widths.length/2)]:SW*.09;
+    merged.forEach(function(b){
+      var bw=b.e-b.s;
+      if(bw>med*1.8){var count=Math.max(2,Math.round(bw/med));for(var q=0;q<count;q++)rects.push({x:b.s+q*bw/count,y:row.s,w:bw/count,h:rh});}
+      else if(bw>SW*.035)rects.push({x:b.s,y:row.s,w:bw,h:rh});
+    });
+  });
+  // Conservative geometry filter and left-to-right order.
+  rects=rects.filter(function(r){var a=r.w/r.h;return r.w>SW*.035&&r.h>SH*.10&&a>.18&&a<1.25;});
+  rects.sort(function(a,b){return Math.abs(a.y-b.y)>SH*.05?a.y-b.y:a.x-b.x;});
+  if(!rects.length){setProgress(-1);log('No reliable diagrams found. Use manual selection around one diagram and its name.');return;}
+  setProgress(.65); log('Testing '+rects.length+' candidate areas…');
+  var added=0;
+  for(var ri=0;ri<rects.length&&added<32;ri++){
+    var r=rects[ri],padX=r.w*.12,padY=r.h*.08;
+    var cr={x:Math.max(0,(r.x-padX)/scale*state.scale),y:Math.max(0,(r.y-padY)/scale*state.scale),w:Math.min(W,(r.w+2*padX)/scale)*state.scale,h:Math.min(H,(r.h+2*padY)/scale)*state.scale};
+    var test=cropCanvas(cr,{x:0,y:.12,w:1,h:.88});
+    var det=null;try{det=recognizeChord(test);}catch(e){}
+    if(det){await addRect(cr);added++;}
+    setProgress(.65+.35*(ri+1)/rects.length);
   }
-
-  var edgeSorted = new Float32Array(edge); edgeSorted.sort();
-  var edgeThresh = edgeSorted[Math.floor(edgeSorted.length * 0.88)] || 30;
-  var edgeBin = new Uint8Array(scanW * scanH);
-  for (var i = 0; i < scanW*scanH; i++) edgeBin[i] = edge[i] > edgeThresh ? 1 : 0;
-
-  var hEdgeProj = new Uint32Array(scanH);
-  for (var y = 0; y < scanH; y++) { var s=0; for(var x=0;x<scanW;x++) s+=edgeBin[y*scanW+x]; hEdgeProj[y]=s; }
-  var vEdgeProj = new Uint32Array(scanW);
-  for (var x = 0; x < scanW; x++) { var s=0; for(var y=0;y<scanH;y++) s+=edgeBin[y*scanW+x]; vEdgeProj[x]=s; }
-
-  setProgress(0.5);
-
-  var hThresh = scanW * 0.05;
-  var hBands = []; var inB=false, bS=0;
-  for (var y = 0; y < scanH; y++) {
-    if (hEdgeProj[y] > hThresh && !inB) { inB=true; bS=y; }
-    else if (hEdgeProj[y] <= hThresh && inB) { if(y-bS>15) hBands.push({s:bS,e:y}); inB=false; }
-  }
-  if (inB && scanH-bS>15) hBands.push({s:bS,e:scanH});
-
-  var vThresh = scanH * 0.03;
-  var vBands = []; inB=false; bS=0;
-  for (var x = 0; x < scanW; x++) {
-    if (vEdgeProj[x] > vThresh && !inB) { inB=true; bS=x; }
-    else if (vEdgeProj[x] <= vThresh && inB) { if(x-bS>10) vBands.push({s:bS,e:x}); inB=false; }
-  }
-  if (inB && scanW-bS>10) vBands.push({s:bS,e:scanW});
-
-  setProgress(0.7);
-
-  var candidates = [];
-  for (var hi = 0; hi < hBands.length; hi++) {
-    for (var vi = 0; vi < vBands.length; vi++) {
-      var bw = vBands[vi].e - vBands[vi].s;
-      var bh = hBands[hi].e - hBands[hi].s;
-      var aspect = bw / bh;
-      if (aspect < 0.3 || aspect > 3.0) continue;
-      if (bw < 20 || bh < 25) continue;
-      candidates.push({x: vBands[vi].s, y: hBands[hi].s, w: bw, h: bh, score: bw*bh});
-    }
-  }
-
-  if (!candidates.length) { log('No diagrams found.'); setProgress(-1); return; }
-
-  candidates.sort(function(a,b){return b.score - a.score;});
-  var merged = [];
-  for (var ci = 0; ci < candidates.length; ci++) {
-    var c = candidates[ci];
-    var overlap = false;
-    for (var mi = 0; mi < merged.length; mi++) {
-      var m = merged[mi];
-      var ox = Math.max(0, Math.min(c.x+c.w, m.x+m.w) - Math.max(c.x, m.x));
-      var oy = Math.max(0, Math.min(c.y+c.h, m.y+m.h) - Math.max(c.y, m.y));
-      if (ox * oy > Math.min(c.w*c.h, m.w*m.h) * 0.4) { overlap = true; break; }
-    }
-    if (!overlap && merged.length < 24) merged.push(c);
-  }
-
-  setProgress(0.9);
-  log('Found ' + merged.length + ' diagrams. Slicing…');
-
-  var imgScaleX = W / scanW;
-  var imgScaleY = H / scanH;
-
-  // Common chord names lookup fallback in order if OCR fails
-  var commonNames = ['Am','G','C','D','F','Em','A','E','Dm','B7','Cmaj7','G7'];
-
-  for (var mi2 = 0; mi2 < merged.length; mi2++) {
-    if (state.autoDetectAbort) break;
-    var cand = merged[mi2];
-    var padY = Math.round(cand.h * 0.5); // include room for name above
-    var padX = Math.round(cand.w * 0.1);
-    var canvasRect = {
-      x: Math.round(Math.max(0, cand.x - padX) * imgScaleX * state.scale),
-      y: Math.round(Math.max(0, cand.y - padY) * imgScaleY * state.scale),
-      w: Math.round((cand.w + padX*2) * imgScaleX * state.scale),
-      h: Math.round((cand.h + padY) * imgScaleY * state.scale)
-    };
-    setProgress(0.9 + (mi2/merged.length)*0.1);
-    await addRect(canvasRect, commonNames[mi2 % commonNames.length]);
-  }
-
   setProgress(-1);
-  toast('Sliced ' + merged.length + ' diagrams');
-  log('Done — ' + merged.length + ' diagrams sliced and added.');
+  if(!added) log('Candidates were found, but none passed grid validation. Use manual selection for this image.');
+  else {log('Added '+added+' validated diagram'+(added===1?'':'s')+'. Review names and voicings in Edit Chords.');toast('Added '+added+' chords');}
 };
 
 // ---- Chord list & UI ----
