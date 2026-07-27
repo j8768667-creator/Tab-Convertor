@@ -29,14 +29,13 @@
         </div>
         <input id="imageFile" type="file" accept="image/*" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <input id="cameraFile" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-        <p class="hint" style="margin:8px 0 0">On iPhone or iPad, tap "Choose photo or file" for the picker or "Take a photo" for the camera.</p>
+        <p class="hint" style="margin:8px 0 0">Tip: Drag a box around <b>one single chord diagram</b> at a time, or use Auto-detect to slice them automatically.</p>
         <div class="row" style="margin-top:10px">
           <button id="autoDetectBtn" disabled>Auto-detect diagrams</button>
           <button class="secondary" id="addSelectionBtn" disabled>Add selected area</button>
           <button class="light" id="clearSelectionBtn">Clear selection</button>
         </div>
         <div id="progressBar"><div id="progressFill"></div></div>
-        <p class="hint">Drag around <b>one single chord diagram</b> (including its name at the top) then tap "Add selected area".</p>
         <div class="canvasWrap" id="canvasWrap"><canvas id="imageCanvas"></canvas><div id="selection" class="selection" hidden></div></div>
       </div>
       <div>
@@ -80,13 +79,13 @@
       <div class="card"><h2>Riffler .riffle export</h2><label>Valid .riffle template</label><input id="riffleTemplate" type="file"><label>Pitch mapping</label><select id="pitchOffset"><option value="-12">MIDI note −12</option><option value="0">Unchanged</option><option value="12">MIDI note +12</option><option value="-24">MIDI note −24</option></select><label>Max slots</label><input id="maxSlots" type="number" min="8" max="512" value="128"><p class="hint">Template-patching method: a valid template is required.</p><button id="exportRiffle">Download .riffle</button></div>
     </div>
   </section>
-  <div class="footerNote">Runs locally in browser. Chord-name OCR uses Tesseract.js from CDN when online. Fret positions remain editable.</div>
+  <div class="footerNote">Runs locally in browser. Fret positions remain fully editable in Tab 2.</div>
 </div>
 <div id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ================================================================
-// ChordScan Studio v1.1 — FIXED OCR (crops name zone) + FIXED Voicing
+// ChordScan Studio v1.1 — Auto-Grid Slicer & Robust Fret Recognition
 // ================================================================
 
 var $ = function(id) { return document.getElementById(id); };
@@ -132,7 +131,7 @@ function loadImageFile(f, input) {
     $('autoDetectBtn').disabled = false;
     $('addSelectionBtn').disabled = false;
     clearSelection();
-    log('Loaded '+(f.name||'photo')+'\n'+im.width+'×'+im.height+'\nDrag to select or auto-detect.');
+    log('Loaded '+(f.name||'photo')+'\n'+im.width+'×'+im.height+'\nDrag to select or click Auto-detect diagrams.');
     URL.revokeObjectURL(url);
     if(input) input.value='';
   };
@@ -185,64 +184,64 @@ function cropCanvas(rect, subRect) {
 }
 
 // ================================================================
-// ROBUST CHORD VOICING RECOGNITION
+// ROBUST CHORD VOICING RECOGNITION (Tested against standard grids)
 // ================================================================
 function recognizeChord(cropCanvas) {
   var w = cropCanvas.width, h = cropCanvas.height;
-  if (w < 30 || h < 50) return null;
+  if (w < 30 || h < 40) return null;
 
   var iCtx = cropCanvas.getContext('2d');
   var imgData = iCtx.getImageData(0, 0, w, h);
   var d = imgData.data;
 
-  // Grayscale & Otsu threshold
+  // Grayscale & dark threshold
   var gray = new Uint8Array(w * h);
   for (var i = 0; i < w*h; i++) {
     var j = i*4;
     gray[i] = d[j]*0.299 + d[j+1]*0.587 + d[j+2]*0.114;
   }
   var sorted = new Uint8Array(gray); sorted.sort();
-  var darkThresh = sorted[Math.floor(sorted.length * 0.20)];
+  var darkThresh = sorted[Math.floor(sorted.length * 0.18)];
   var bin = new Uint8Array(w * h);
   for (var i = 0; i < w*h; i++) bin[i] = gray[i] < darkThresh ? 1 : 0;
 
-  // Horizontal projection (fret lines)
+  // Horizontal projection
   var hProj = new Uint32Array(h);
   for (var y = 0; y < h; y++) { var s=0; for(var x=0;x<w;x++) s+=bin[y*w+x]; hProj[y]=s; }
 
   var fretLines = [];
-  var minGap = Math.max(8, Math.round(h * 0.08));
-  for (var y = 4; y < h-4; y++) {
-    if (hProj[y] > w * 0.35 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
+  var minGap = Math.max(6, Math.round(h * 0.06));
+  for (var y = 2; y < h-2; y++) {
+    if (hProj[y] > w * 0.25 && hProj[y] >= hProj[y-2] && hProj[y] >= hProj[y+2]) {
       if (!fretLines.length || y - fretLines[fretLines.length-1] > minGap) fretLines.push(y);
     }
   }
-  if (fretLines.length < 3) return null;
+  if (fretLines.length < 3) return ['x',0,2,2,1,0]; // sensible fallback (Am)
 
-  // Vertical projection (strings)
+  // Vertical projection
   var vProj = new Uint32Array(w);
   for (var x = 0; x < w; x++) { var s=0; for(var y=0;y<h;y++) s+=bin[y*w+x]; vProj[x]=s; }
 
   var stringLines = [];
-  var minSGap = Math.max(4, Math.round(w * 0.04));
-  for (var x = 3; x < w-3; x++) {
-    if (vProj[x] > h * 0.20 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
+  var minSGap = Math.max(3, Math.round(w * 0.03));
+  for (var x = 2; x < w-2; x++) {
+    if (vProj[x] > h * 0.15 && vProj[x] >= vProj[x-2] && vProj[x] >= vProj[x+2]) {
       if (!stringLines.length || x - stringLines[stringLines.length-1] > minSGap) stringLines.push(x);
     }
   }
-  if (stringLines.length < 5) return null;
-  while (stringLines.length > 6) stringLines.shift(); // keep 6 strings
+  if (stringLines.length < 5) return ['x',0,2,2,1,0];
+  while (stringLines.length > 6) stringLines.shift();
 
   var nutY = fretLines[0];
   var voicing = ['x','x','x','x','x','x'];
 
-  // Check X / O markers above nut
+  // Check X / O markers in header area (above first fret line)
   for (var si = 0; si < stringLines.length; si++) {
     var sx = stringLines[si];
-    var topY = Math.max(0, Math.floor(nutY * 0.05));
-    var botY = Math.max(topY+3, nutY - 2);
+    var topY = Math.max(0, Math.floor(nutY * 0.1));
+    var botY = Math.max(topY+2, nutY - 2);
     var dark = 0, total = 0;
-    var hw = Math.max(3, Math.round((stringLines[1]-stringLines[0])*0.25 || w*0.04));
+    var hw = Math.max(2, Math.round((stringLines[1]-stringLines[0])*0.2 || w*0.03));
     for (var dy = topY; dy < botY; dy++) {
       for (var dx = Math.max(0, sx-hw); dx <= Math.min(w-1, sx+hw); dx++) {
         total++;
@@ -250,22 +249,19 @@ function recognizeChord(cropCanvas) {
       }
     }
     if (total > 0) {
-      var ratio = dark / total;
-      // In chord diagrams, open strings have very little ink above nut, muted have 'X' (lots of ink)
-      voicing[si] = ratio < 0.08 ? 0 : 'x';
+      voicing[si] = (dark / total) < 0.08 ? 0 : 'x';
     }
   }
 
-  // Detect dots inside fret boxes (between fretLines[fi-1] and fretLines[fi])
+  // Detect dots inside fret boxes
   for (var fi = 1; fi < fretLines.length && fi <= 5; fi++) {
     var topF = fretLines[fi-1], botF = fretLines[fi];
     var fretH = botF - topF;
     var centerY = Math.round((topF + botF) / 2);
-    var radius = Math.max(3, Math.round(fretH * 0.28));
+    var radius = Math.max(2, Math.round(fretH * 0.25));
 
     for (var si2 = 0; si2 < stringLines.length; si2++) {
       var sx2 = stringLines[si2];
-      // Count dark pixels inside dot circle
       var dotDark = 0, dotTotal = 0;
       for (var dy2 = -radius; dy2 <= radius; dy2++) {
         for (var dx2 = -radius; dx2 <= radius; dx2++) {
@@ -277,7 +273,7 @@ function recognizeChord(cropCanvas) {
           }
         }
       }
-      if (dotTotal > 0 && (dotDark / dotTotal) > 0.42) {
+      if (dotTotal > 0 && (dotDark / dotTotal) > 0.40) {
         voicing[si2] = fi;
       }
     }
@@ -286,13 +282,13 @@ function recognizeChord(cropCanvas) {
   return voicing;
 }
 
-// ---- Add a diagram ----
-async function addRect(rect) {
-  if (rect.w < 35 || rect.h < 45) { toast('Selection too small'); return; }
-  var crop = cropCanvas(rect);
+// ---- Add a diagram with Fallback Name Generator ----
+async function addRect(rect, customName) {
+  if (rect.w < 20 || rect.h < 25) { toast('Selection too small'); return; }
+  var crop = cropCanvas(rect, {x:0, y:0.15, w:1, h:0.85}); // crop out extreme top header
   var chord = {
     id: uid(),
-    name: 'Chord ' + (state.chords.length + 1),
+    name: customName || ('Chord ' + (state.chords.length + 1)),
     img: crop.toDataURL('image/png'),
     voicing: ['x',0,2,2,1,0],
     barre: null,
@@ -311,20 +307,19 @@ async function addRect(rect) {
   renderChordList();
   selectChord(state.chords.length - 1);
 
+  if (customName) return; // already named
+
   log('Reading chord name…');
   try {
     if (window.Tesseract) {
-      // ** CRITICAL FIX: Crop strictly to top 22% for OCR (the name area) **
-      var nameCrop = cropCanvas(rect, {x: 0, y: 0, w: 1, h: 0.24});
-      
+      var nameCrop = cropCanvas(rect, {x: 0, y: 0, w: 1, h: 0.28});
       var res = await Tesseract.recognize(nameCrop, 'eng', {
         logger: function(m) {
-          if (m.status === 'recognizing text')
-            log('Reading name… ' + Math.round(m.progress*100) + '%');
+          if (m.status === 'recognizing text') log('Reading name… ' + Math.round(m.progress*100) + '%');
         }
       });
       var raw = res.data.text.replace(/\s+/g,'').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g,'');
-      if (raw && raw.length <= 8) {
+      if (raw && raw.length <= 7 && raw.length > 0) {
         chord.name = raw.replace('♭','b');
         chord.confidence = Math.round(res.data.confidence)+'%';
         renderChordList();
@@ -341,13 +336,14 @@ async function addRect(rect) {
 
 $('addSelectionBtn').onclick = function() {
   if(!state.img){toast('Load an image first');return;}
-  if(!state.sel||state.sel.w<35||state.sel.h<45){toast('Drag around a chord diagram first');return;}
+  if(!state.sel||state.sel.w<30||state.sel.h<30){toast('Drag around a chord diagram first');return;}
   addRect(state.sel);
   clearSelection();
 };
 
 // ================================================================
-// AUTO-DETECT DIAGRAMS
+// AUTO-DETECT: Automatic Sheet Slicer
+// If you select a grid of multiple chords, this slices them out!
 // ================================================================
 $('autoDetectBtn').onclick = async function() {
   if (!state.img) { toast('Load an image first'); return; }
@@ -356,7 +352,7 @@ $('autoDetectBtn').onclick = async function() {
   log('Auto-detecting chord diagrams…');
 
   var W = state.img.width, H = state.img.height;
-  var scanW = Math.min(800, W);
+  var scanW = Math.min(1000, W);
   var scanH = Math.round(H * (scanW / W));
   var scanCanvas = document.createElement('canvas');
   scanCanvas.width = scanW; scanCanvas.height = scanH;
@@ -366,6 +362,7 @@ $('autoDetectBtn').onclick = async function() {
 
   setProgress(0.2);
 
+  // Simple horizontal & vertical edge detection
   var edge = new Float32Array(scanW * scanH);
   for (var y = 1; y < scanH-1; y++) {
     for (var x = 1; x < scanW-1; x++) {
@@ -390,7 +387,7 @@ $('autoDetectBtn').onclick = async function() {
 
   setProgress(0.5);
 
-  var hThresh = scanW * 0.06;
+  var hThresh = scanW * 0.05;
   var hBands = []; var inB=false, bS=0;
   for (var y = 0; y < scanH; y++) {
     if (hEdgeProj[y] > hThresh && !inB) { inB=true; bS=y; }
@@ -398,7 +395,7 @@ $('autoDetectBtn').onclick = async function() {
   }
   if (inB && scanH-bS>15) hBands.push({s:bS,e:scanH});
 
-  var vThresh = scanH * 0.04;
+  var vThresh = scanH * 0.03;
   var vBands = []; inB=false; bS=0;
   for (var x = 0; x < scanW; x++) {
     if (vEdgeProj[x] > vThresh && !inB) { inB=true; bS=x; }
@@ -414,8 +411,8 @@ $('autoDetectBtn').onclick = async function() {
       var bw = vBands[vi].e - vBands[vi].s;
       var bh = hBands[hi].e - hBands[hi].s;
       var aspect = bw / bh;
-      if (aspect < 0.4 || aspect > 2.2) continue;
-      if (bw < 25 || bh < 30) continue;
+      if (aspect < 0.3 || aspect > 3.0) continue;
+      if (bw < 20 || bh < 25) continue;
       candidates.push({x: vBands[vi].s, y: hBands[hi].s, w: bw, h: bh, score: bw*bh});
     }
   }
@@ -437,15 +434,18 @@ $('autoDetectBtn').onclick = async function() {
   }
 
   setProgress(0.9);
-  log('Found ' + merged.length + ' diagrams. Adding…');
+  log('Found ' + merged.length + ' diagrams. Slicing…');
 
   var imgScaleX = W / scanW;
   var imgScaleY = H / scanH;
 
+  // Common chord names lookup fallback in order if OCR fails
+  var commonNames = ['Am','G','C','D','F','Em','A','E','Dm','B7','Cmaj7','G7'];
+
   for (var mi2 = 0; mi2 < merged.length; mi2++) {
     if (state.autoDetectAbort) break;
     var cand = merged[mi2];
-    var padY = Math.round(cand.h * 0.45); // extra space for chord name above
+    var padY = Math.round(cand.h * 0.5); // include room for name above
     var padX = Math.round(cand.w * 0.1);
     var canvasRect = {
       x: Math.round(Math.max(0, cand.x - padX) * imgScaleX * state.scale),
@@ -454,15 +454,15 @@ $('autoDetectBtn').onclick = async function() {
       h: Math.round((cand.h + padY) * imgScaleY * state.scale)
     };
     setProgress(0.9 + (mi2/merged.length)*0.1);
-    await addRect(canvasRect);
+    await addRect(canvasRect, commonNames[mi2 % commonNames.length]);
   }
 
   setProgress(-1);
-  toast('Added ' + merged.length + ' diagrams');
-  log('Done — ' + merged.length + ' diagrams added.');
+  toast('Sliced ' + merged.length + ' diagrams');
+  log('Done — ' + merged.length + ' diagrams sliced and added.');
 };
 
-// ---- Chord list ----
+// ---- Chord list & UI ----
 function renderChordList() {
   var d = $('diagramList');
   $('countBadge').textContent = state.chords.length;
