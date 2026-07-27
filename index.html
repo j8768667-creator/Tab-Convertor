@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>ChordScan Studio v1</title>
+<style>
+:root{--bg:#f6f2e9;--card:#fff;--ink:#17231c;--muted:#687269;--line:#d9d0c2;--green:#2f4f3e;--sage:#7a8f7b;--cream:#f4f1ea;--danger:#9d3b35;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}header{position:sticky;top:0;z-index:20;background:rgba(246,242,233,.94);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:14px 16px}header h1{font-size:24px;margin:0}header p{margin:3px 0 0;color:var(--muted);font-size:14px}.wrap{max-width:1180px;margin:auto;padding:14px}.grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:0 2px 12px #0000000a;margin-bottom:14px}.card h2{font-size:18px;margin:0 0 10px}.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1}button,.btn{appearance:none;border:0;border-radius:11px;background:var(--green);color:#fff;padding:11px 14px;font-size:15px;font-weight:750;cursor:pointer}button.secondary{background:#786b59}button.light{background:var(--cream);color:var(--ink);border:1px solid var(--line)}button.danger{background:var(--danger)}button:disabled{opacity:.45}input,select{font:inherit;border:1px solid #cfc6b8;border-radius:9px;padding:9px;background:#fff;color:var(--ink)}input[type=file]{width:100%}.hint{color:var(--muted);font-size:13px;line-height:1.4}.canvasWrap{position:relative;overflow:auto;max-height:62vh;background:#eee8dc;border:1px solid var(--line);border-radius:12px;touch-action:none}canvas#imageCanvas{display:block;max-width:none;cursor:crosshair}.selection{position:absolute;border:3px solid #2f4f3e;background:#2f4f3e22;pointer-events:none}.status{white-space:pre-wrap;font:12px ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--cream);padding:10px;border-radius:10px;min-height:42px}.diagramList{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.diagramCard{border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.diagramCard.selected{outline:3px solid #7a8f7b}.diagramCard h3{font-size:17px;margin:0 0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mini{width:100%;aspect-ratio:1/1.15;background:#faf8f3;border-radius:7px}.editor{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fretboard{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:repeat(7,42px);border-left:2px solid #222;border-top:5px solid #222;background:#fff}.cell{border-right:1px solid #555;border-bottom:1px solid #777;display:flex;align-items:center;justify-content:center;font-weight:800;user-select:none}.cell.marker{border-bottom:0;background:#fafafa;font-size:15px}.cell.dot{background:radial-gradient(circle at center,#222 0 10px,transparent 11px);color:#fff}.cell.barre{background:#222;color:#fff}.progression{display:flex;gap:9px;overflow-x:auto;padding:5px 0 10px}.step{min-width:145px;border:1px solid var(--line);border-radius:12px;padding:9px;background:#fff}.step strong{display:block;font-size:18px}.step select,.step input{width:100%;margin-top:6px}.tabbar{display:flex;gap:7px;margin-bottom:12px;overflow:auto}.tabbar button.active{background:var(--sage)}.pane{display:none}.pane.active{display:block}.full{width:100%}.check{display:flex;gap:7px;align-items:center}.check input{width:auto}.footerNote{font-size:12px;color:var(--muted);padding:10px 0 25px}.ocrBadge{font-size:12px;padding:3px 7px;border-radius:99px;background:#e7eee9;color:#2f4f3e;display:inline-block}.sep{height:1px;background:var(--line);margin:12px 0}@media(max-width:850px){.grid,.editor{grid-template-columns:1fr}.canvasWrap{max-height:48vh}.wrap{padding:10px}header{position:relative}}
+</style>
+</head>
+<body>
+<header><h1>ChordScan Studio v1</h1><p>Capture guitar chord diagrams, build a progression, then export MIDI or Riffler .riffle.</p></header>
+<div class="wrap">
+  <div class="tabbar">
+    <button class="active" data-pane="scan">1. Scan</button>
+    <button data-pane="edit">2. Edit Chords</button>
+    <button data-pane="arrange">3. Arrange</button>
+    <button data-pane="export">4. Export</button>
+  </div>
+
+  <section id="scan" class="pane active">
+    <div class="grid">
+      <div class="card">
+        <h2>Import chord sheet</h2>
+        <input id="imageFile" type="file" accept="image/*" capture="environment">
+        <div class="row" style="margin-top:10px">
+          <button id="autoDetectBtn" disabled>Auto-detect diagrams</button>
+          <button class="secondary" id="addSelectionBtn" disabled>Add selected area</button>
+          <button class="light" id="clearSelectionBtn">Clear selection</button>
+        </div>
+        <p class="hint">Drag around one chord diagram, including its chord name, then tap “Add selected area”. Auto-detect works best on clean screenshots with evenly spaced diagrams.</p>
+        <div class="canvasWrap" id="canvasWrap"><canvas id="imageCanvas"></canvas><div id="selection" class="selection" hidden></div></div>
+      </div>
+      <div>
+        <div class="card"><h2>Recognition status</h2><div id="status" class="status">Load a chord-diagram image to begin.</div></div>
+        <div class="card"><h2>Detected chords <span id="countBadge" class="ocrBadge">0</span></h2><div id="diagramList" class="diagramList"><p class="hint">No diagrams added yet.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="edit" class="pane">
+    <div class="card">
+      <h2>Chord editor</h2>
+      <div id="emptyEditor" class="hint">Add or select a chord diagram first.</div>
+      <div id="editor" class="editor" hidden>
+        <div>
+          <label>Chord name</label><input id="chordName" class="full" placeholder="e.g. Am7">
+          <div class="row" style="margin-top:8px"><label class="check"><input type="checkbox" id="useDetectedVoicing" checked> Use diagram voicing</label></div>
+          <p class="hint">Tap the top row to cycle open (O), muted (X), or fretted. Tap a fret cell to place/remove a note. Drag-style barres can be added with the barre controls.</p>
+          <div class="row"><label>Barre fret <input id="barreFret" type="number" min="0" max="20" value="0" style="width:75px"></label><label>From string <select id="barreFrom"><option>6</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></label><label>To <select id="barreTo"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label></div>
+          <div class="row" style="margin-top:8px"><button id="applyBarre">Apply barre</button><button class="light" id="clearBarre">Clear barre</button><button class="danger" id="deleteChord">Delete chord</button></div>
+        </div>
+        <div><div id="fretboard" class="fretboard"></div><p id="voicingText" class="hint"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="arrange" class="pane">
+    <div class="card">
+      <h2>Progression builder</h2>
+      <div class="row"><label>Tempo <input id="tempo" type="number" min="30" max="240" value="100" style="width:90px"> BPM</label><label>Time signature <select id="timeSig"><option value="4">4/4</option><option value="3">3/4</option><option value="6">6/8</option></select></label><label>Pattern <select id="pattern"><option value="block">Block chord</option><option value="down">Down strum</option><option value="updown">Down/up strum</option><option value="arp">Arpeggio</option></select></label></div>
+      <div class="sep"></div>
+      <div class="row"><select id="addChordSelect" class="grow"></select><button id="addToProgression">Add chord</button><button class="light" id="clearProgression">Clear</button></div>
+      <div id="progression" class="progression"><p class="hint">Add recognised chords to create a timeline.</p></div>
+      <button id="playBtn">▶ Play preview</button><button class="secondary" id="stopBtn">■ Stop</button>
+    </div>
+  </section>
+
+  <section id="export" class="pane">
+    <div class="grid">
+      <div class="card"><h2>MIDI export</h2><label>Instrument program <input id="program" type="number" min="0" max="127" value="24"></label><p class="hint">Program 24 is nylon guitar in General MIDI. Export includes tempo, chord timing and the selected strum/arpeggio pattern.</p><button id="exportMidi">Download MIDI</button></div>
+      <div class="card"><h2>Riffler .riffle export</h2><label>Valid .riffle template</label><input id="riffleTemplate" type="file"><label>Pitch mapping</label><select id="pitchOffset"><option value="-12" selected>MIDI note −12</option><option value="0">Unchanged</option><option value="12">MIDI note +12</option><option value="-24">MIDI note −24</option></select><label>Maximum note slots</label><input id="maxSlots" type="number" min="8" max="512" value="128"><p class="hint">This uses the same template-patching method as your MIDI-to-Riffle converter. Riffler’s native format is not publicly documented, so a valid template is required and some complex progressions may need a similar-length template.</p><button id="exportRiffle">Download .riffle</button></div>
+    </div>
+  </section>
+  <div class="footerNote">Runs locally in your browser. Chord-name OCR uses Tesseract.js from a CDN when internet access is available; all fret positions remain manually editable.</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const $=id=>document.getElementById(id); const state={img:null,scale:1,sel:null,chords:[],selected:-1,progression:[],audio:null};
+const tuning=[40,45,50,55,59,64]; // strings 6..1
+function log(s){$('status').textContent=s} function uid(){return Math.random().toString(36).slice(2)}
+function switchPane(id){document.querySelectorAll('.pane').forEach(x=>x.classList.toggle('active',x.id===id));document.querySelectorAll('.tabbar button').forEach(x=>x.classList.toggle('active',x.dataset.pane===id))}
+document.querySelectorAll('.tabbar button').forEach(b=>b.onclick=()=>switchPane(b.dataset.pane));
+
+const canvas=$('imageCanvas'),ctx=canvas.getContext('2d'),wrap=$('canvasWrap'),selEl=$('selection');
+$('imageFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const im=new Image();im.onload=()=>{state.img=im;const maxW=Math.min(1050,wrap.clientWidth||900);state.scale=Math.min(1,maxW/im.width);canvas.width=Math.round(im.width*state.scale);canvas.height=Math.round(im.height*state.scale);ctx.drawImage(im,0,0,canvas.width,canvas.height);$('autoDetectBtn').disabled=false;$('addSelectionBtn').disabled=false;log(`Loaded ${f.name}\nImage: ${im.width} × ${im.height}\nDrag around a diagram or try auto-detect.`)};im.src=URL.createObjectURL(f)};
+let drag=false,start={x:0,y:0};
+function pos(ev){const r=canvas.getBoundingClientRect(),p=ev.touches?ev.touches[0]:ev;return{x:Math.max(0,Math.min(canvas.width,p.clientX-r.left)),y:Math.max(0,Math.min(canvas.height,p.clientY-r.top))}}
+function drawSel(a,b){const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);state.sel={x,y,w,h};Object.assign(selEl.style,{left:x+'px',top:y+'px',width:w+'px',height:h+'px'});selEl.hidden=false}
+canvas.onpointerdown=e=>{drag=true;start=pos(e);canvas.setPointerCapture(e.pointerId)};canvas.onpointermove=e=>{if(drag)drawSel(start,pos(e))};canvas.onpointerup=e=>{drag=false;drawSel(start,pos(e))};$('clearSelectionBtn').onclick=()=>{state.sel=null;selEl.hidden=true};
+
+function cropCanvas(rect){const c=document.createElement('canvas');c.width=Math.max(1,Math.round(rect.w/state.scale));c.height=Math.max(1,Math.round(rect.h/state.scale));c.getContext('2d').drawImage(state.img,rect.x/state.scale,rect.y/state.scale,rect.w/state.scale,rect.h/state.scale,0,0,c.width,c.height);return c}
+async function addRect(rect){if(rect.w<35||rect.h<45)return;const crop=cropCanvas(rect), chord={id:uid(),name:'Chord '+(state.chords.length+1),img:crop.toDataURL('image/png'),voicing:['x',0,2,2,1,0],barre:null,confidence:'manual'};state.chords.push(chord);renderChordList();selectChord(state.chords.length-1);log('Diagram added. Reading chord name…');try{if(window.Tesseract){const top=document.createElement('canvas');top.width=crop.width;top.height=Math.max(25,Math.floor(crop.height*.3));top.getContext('2d').drawImage(crop,0,0,crop.width,top.height,0,0,crop.width,top.height);const res=await Tesseract.recognize(top,'eng',{logger:m=>{if(m.status==='recognizing text')log(`Reading chord name… ${Math.round(m.progress*100)}%`)}});const raw=res.data.text.replace(/\s+/g,'').replace(/[^A-Ga-g#♭bmsuadjM0-9+\/()]/g,'');if(raw){chord.name=raw.replace('♭','b');chord.confidence=Math.round(res.data.confidence)+'%';renderChordList();selectChord(state.chords.indexOf(chord));}log(`Added ${chord.name}. Check the voicing in Edit Chords.`)}else log('Added diagram. OCR unavailable; enter the chord name manually.')}catch(err){log('Added diagram. OCR could not read the name; enter it manually.')}}
+$('addSelectionBtn').onclick=()=>state.sel?addRect(state.sel):log('Drag around a chord diagram first.');
+
+$('autoDetectBtn').onclick=async()=>{if(!state.img)return;log('Looking for diagram-like grid regions…');const data=ctx.getImageData(0,0,canvas.width,canvas.height),W=canvas.width,H=canvas.height,gray=new Uint8Array(W*H);for(let i=0;i<W*H;i++){const j=i*4;gray[i]=(data.data[j]+data.data[j+1]+data.data[j+2])/3<105?1:0}const boxes=[];const win=Math.max(80,Math.round(W/10)),step=Math.max(25,Math.round(win/3));for(let y=0;y<H-win;y+=step){for(let x=0;x<W-win*.75;x+=step){const ww=Math.round(win*.85),hh=Math.round(win*1.05);let vert=0,horiz=0;for(let xx=x;xx<x+ww;xx+=Math.max(2,Math.round(ww/18))){let c=0;for(let yy=y;yy<y+hh;yy++)c+=gray[yy*W+xx];if(c>hh*.45)vert++}for(let yy=y;yy<y+hh;yy+=Math.max(2,Math.round(hh/20))){let c=0;for(let xx=x;xx<x+ww;xx++)c+=gray[yy*W+xx];if(c>ww*.45)horiz++}if(vert>=4&&horiz>=4)boxes.push({x:Math.max(0,x-ww*.08),y:Math.max(0,y-hh*.25),w:ww*1.16,h:hh*1.28,score:vert+horiz})}}boxes.sort((a,b)=>b.score-a.score);const chosen=[];for(const b of boxes){if(chosen.length>=18)break;const overlap=chosen.some(c=>{const ix=Math.max(0,Math.min(b.x+b.w,c.x+c.w)-Math.max(b.x,c.x)),iy=Math.max(0,Math.min(b.y+b.h,c.y+c.h)-Math.max(b.y,c.y));return ix*iy>Math.min(b.w*b.h,c.w*c.h)*.35});if(!overlap)chosen.push(b)}if(!chosen.length){log('No reliable grids found. Drag around each diagram manually.');return}log(`Found ${chosen.length} possible diagrams. Adding them…`);for(const b of chosen)await addRect(b);log(`Finished. ${chosen.length} candidate diagrams added. Remove any false detections.`)};
+
+function renderChordList(){const d=$('diagramList');$('countBadge').textContent=state.chords.length;if(!state.chords.length){d.innerHTML='<p class="hint">No diagrams added yet.</p>';updateChordSelect();return}d.innerHTML=state.chords.map((c,i)=>`<div class="diagramCard ${i===state.selected?'selected':''}" data-i="${i}"><h3>${esc(c.name)}</h3><img class="mini" src="${c.img}"><div class="hint">OCR: ${c.confidence}</div></div>`).join('');d.querySelectorAll('.diagramCard').forEach(x=>x.onclick=()=>{selectChord(+x.dataset.i);switchPane('edit')});updateChordSelect()}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function selectChord(i){state.selected=i;renderChordList();const c=state.chords[i];$('emptyEditor').hidden=!!c;$('editor').hidden=!c;if(!c)return;$('chordName').value=c.name;$('barreFret').value=c.barre?.fret||0;$('barreFrom').value=c.barre?.from||6;$('barreTo').value=c.barre?.to||1;renderFretboard()}
+$('chordName').oninput=e=>{const c=state.chords[state.selected];if(c){c.name=e.target.value||'Untitled';renderChordList();renderProgression()}}
+function renderFretboard(){const c=state.chords[state.selected];if(!c)return;const fb=$('fretboard');fb.innerHTML='';for(let s=0;s<6;s++){const cell=document.createElement('div');cell.className='cell marker';cell.textContent=c.voicing[s]==='x'?'X':c.voicing[s]===0?'O':'●';cell.onclick=()=>{const v=c.voicing[s];c.voicing[s]=v==='x'?0:v===0?1:'x';renderFretboard()};fb.appendChild(cell)}for(let fret=1;fret<=6;fret++)for(let s=0;s<6;s++){const cell=document.createElement('div');let barre=c.barre&&c.barre.fret===fret&&s>=6-c.barre.from&&s<=6-c.barre.to;cell.className='cell'+(c.voicing[s]===fret?' dot':'')+(barre?' barre':'');cell.onclick=()=>{c.voicing[s]=c.voicing[s]===fret?'x':fret;renderFretboard()};fb.appendChild(cell)}$('voicingText').textContent='String 6→1: '+c.voicing.join('  ')+'   MIDI: '+voicingNotes(c).join(', ')}
+$('applyBarre').onclick=()=>{const c=state.chords[state.selected];if(!c)return;c.barre={fret:+$('barreFret').value,from:+$('barreFrom').value,to:+$('barreTo').value};const a=Math.min(6-c.barre.from,6-c.barre.to),b=Math.max(6-c.barre.from,6-c.barre.to);for(let s=a;s<=b;s++)c.voicing[s]=c.barre.fret;renderFretboard()};$('clearBarre').onclick=()=>{const c=state.chords[state.selected];if(c){c.barre=null;renderFretboard()}};$('deleteChord').onclick=()=>{if(state.selected<0)return;const id=state.chords[state.selected].id;state.chords.splice(state.selected,1);state.progression=state.progression.filter(x=>x.chordId!==id);state.selected=Math.min(state.selected,state.chords.length-1);renderChordList();selectChord(state.selected);renderProgression()};
+function voicingNotes(c){return c.voicing.map((v,i)=>v==='x'?null:tuning[i]+(+v||0)).filter(v=>v!==null)}
+function updateChordSelect(){const s=$('addChordSelect');s.innerHTML=state.chords.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');$('addToProgression').disabled=!state.chords.length}
+$('addToProgression').onclick=()=>{const id=$('addChordSelect').value;if(!id)return;state.progression.push({id:uid(),chordId:id,bars:1});renderProgression()};$('clearProgression').onclick=()=>{state.progression=[];renderProgression()};
+function renderProgression(){const p=$('progression');if(!state.progression.length){p.innerHTML='<p class="hint">Add recognised chords to create a timeline.</p>';return}p.innerHTML=state.progression.map((st,i)=>{const c=state.chords.find(x=>x.id===st.chordId);return `<div class="step"><strong>${esc(c?.name||'Missing')}</strong><label>Bars<input type="number" min="0.25" max="32" step="0.25" value="${st.bars}" data-bars="${i}"></label><button class="light" data-left="${i}">←</button><button class="light" data-right="${i}">→</button><button class="danger" data-del="${i}">Remove</button></div>`}).join('');p.querySelectorAll('[data-bars]').forEach(x=>x.onchange=()=>{state.progression[+x.dataset.bars].bars=Math.max(.25,+x.value||1)});p.querySelectorAll('[data-del]').forEach(x=>x.onclick=()=>{state.progression.splice(+x.dataset.del,1);renderProgression()});p.querySelectorAll('[data-left]').forEach(x=>x.onclick=()=>move(+x.dataset.left,-1));p.querySelectorAll('[data-right]').forEach(x=>x.onclick=()=>move(+x.dataset.right,1))}
+function move(i,d){const j=i+d;if(j<0||j>=state.progression.length)return;[state.progression[i],state.progression[j]]=[state.progression[j],state.progression[i]];renderProgression()}
+
+function buildEvents(){const bpm=+$('tempo').value||100,beatsPerBar=+$('timeSig').value||4,pattern=$('pattern').value,events=[];let beat=0;for(const st of state.progression){const c=state.chords.find(x=>x.id===st.chordId);if(!c)continue;const notes=voicingNotes(c),dur=st.bars*beatsPerBar;if(pattern==='block'){notes.forEach(n=>events.push({beat,n,dur,vel:90}))}else if(pattern==='down'){for(let b=0;b<dur;b+=1)notes.forEach((n,k)=>events.push({beat:beat+b+k*.025,n,dur:.82,vel:92-k*3}))}else if(pattern==='updown'){for(let b=0;b<dur;b+=.5){const rev=Math.round(b*2)%2?notes.slice().reverse():notes;rev.forEach((n,k)=>events.push({beat:beat+b+k*.018,n,dur:.38,vel:86}))}}else{for(let b=0;b<dur;b+=.5){const n=notes[Math.floor((b*2)%Math.max(1,notes.length))];if(n!=null)events.push({beat:beat+b,n,dur:.45,vel:88})}}beat+=dur}return{bpm,beatsPerBar,events,totalBeats:beat}}
+function stopAudio(){if(state.audio){state.audio.close();state.audio=null}}
+$('playBtn').onclick=()=>{stopAudio();const seq=buildEvents();if(!seq.events.length)return;const ac=new (window.AudioContext||window.webkitAudioContext)();state.audio=ac;const sec=60/seq.bpm;seq.events.forEach(e=>{const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+.06+e.beat*sec,d=Math.max(.05,e.dur*sec);o.type='triangle';o.frequency.value=440*Math.pow(2,(e.n-69)/12);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.08,t+.008);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.03)})};$('stopBtn').onclick=stopAudio;
+
+function vlq(v){let b=v&127,out=[b];while(v>>=7){b=(v&127)|128;out.unshift(b)}return out}function u16(n){return[(n>>8)&255,n&255]}function u32(n){return[(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255]}
+function makeMidi(){const {bpm,events,totalBeats}=buildEvents();if(!events.length)throw Error('Build a progression first.');const ppq=480,track=[],tempo=Math.round(60000000/bpm);track.push(0,255,81,3,(tempo>>16)&255,(tempo>>8)&255,tempo&255,0,192,+$('program').value||24);const all=[];events.forEach(e=>{all.push({tick:Math.round(e.beat*ppq),on:1,n:e.n,v:e.vel});all.push({tick:Math.round((e.beat+e.dur)*ppq),on:0,n:e.n,v:0})});all.sort((a,b)=>a.tick-b.tick||a.on-b.on);let last=0;for(const e of all){track.push(...vlq(e.tick-last),e.on?144:128,e.n,e.v);last=e.tick}track.push(...vlq(Math.max(last,Math.round(totalBeats*ppq))-last),255,47,0);return new Uint8Array([...Array.from('MThd').map(c=>c.charCodeAt(0)),...u32(6),...u16(0),...u16(1),...u16(ppq),...Array.from('MTrk').map(c=>c.charCodeAt(0)),...u32(track.length),...track])}
+function download(bytes,name,type='application/octet-stream'){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([bytes],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000)}
+$('exportMidi').onclick=()=>{try{download(makeMidi(),'chordscan_progression.mid','audio/midi')}catch(e){alert(e.message)}};
+function readBytes(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(new Uint8Array(r.result));r.onerror=rej;r.readAsArrayBuffer(f)})}function decodeText(bytes){if(bytes[0]===255&&bytes[1]===254){let s='';for(let i=2;i+1<bytes.length;i+=2)s+=String.fromCharCode(bytes[i]|bytes[i+1]<<8);return s}return new TextDecoder().decode(bytes)}function enc16(s){const o=new Uint8Array(2+s.length*2);o[0]=255;o[1]=254;for(let i=0;i<s.length;i++){const c=s.charCodeAt(i);o[2+i*2]=c&255;o[3+i*2]=c>>8}return o}
+$('exportRiffle').onclick=async()=>{try{const f=$('riffleTemplate').files[0];if(!f)throw Error('Choose a valid .riffle template first.');const nums=decodeText(await readBytes(f)).split(',').map(x=>parseInt(x.trim(),10)).filter(Number.isFinite);if(nums.length<1200)throw Error('Template does not look like a valid .riffle integer file.');const seq=buildEvents();if(!seq.events.length)throw Error('Build a progression first.');const melody=seq.events.slice().sort((a,b)=>a.beat-b.beat||b.n-a.n).filter((e,i,a)=>i===0||e.beat!==a[i-1].beat).map(e=>e.n),start=1024,max=Math.min(+$('maxSlots').value||128,nums.length-start),off=+$('pitchOffset').value;for(let i=0;i<max;i++)nums[start+i]=i<melody.length?melody[i]+off:-1;download(enc16(nums.join(',')),'chordscan_progression.riffle')}catch(e){alert(e.message)}};
+renderChordList();renderProgression();
+</script>
+</body></html>
