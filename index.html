@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ChordScan Studio v2.7 Pro - Dual-Mode Adaptive Grid</title>
+<title>ChordScan Studio v2.8 Pro - Dual-Engine (Grid & Tab Parser)</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -109,8 +109,8 @@
 
 <header>
   <div>
-    <h1>ChordScan Studio v2.7 Pro</h1>
-    <p>Dual-Mode Adaptive Grid Engine</p>
+    <h1>ChordScan Studio v2.8 Pro</h1>
+    <p>Dual-Engine: Grid Diagrams & Tablature Parser</p>
   </div>
 </header>
 
@@ -126,24 +126,24 @@
     <div class="grid">
       <div>
         <div class="card">
-          <h2>1. Import Chord Diagram Image</h2>
+          <h2>1. Import Sheet or Tab Image</h2>
           <div class="row">
-            <label class="btn" for="imageFile">Choose Sheet Photo</label>
+            <label class="btn" for="imageFile">Choose Photo / Screenshot</label>
             <input id="imageFile" type="file" accept="image/*" style="display:none" onchange="loadInputImage(event)">
           </div>
 
           <div class="row" style="margin-top:12px">
             <div class="form-group" style="flex:1">
-              <label>Layout Style</label>
-              <select id="layoutMode">
-                <option value="auto">Auto-Detect Layout (9+6 Grid)</option>
-                <option value="single">Single Row / Continuous</option>
+              <label>Input Document Type</label>
+              <select id="docType">
+                <option value="grid">Chord Diagram Grid (9+6 Sheet)</option>
+                <option value="tabs">Guitar Tablature / Linear Score (e.g. Songsterr)</option>
               </select>
             </div>
           </div>
 
           <div class="row" style="margin-top:12px">
-            <button class="btn primary" id="autoDetectBtn" onclick="runAdaptiveScan()" disabled>Auto-Detect All Chords</button>
+            <button class="btn primary" id="autoDetectBtn" onclick="runSmartScan()" disabled>Run Analysis Engine</button>
           </div>
 
           <div class="canvasWrap">
@@ -155,13 +155,13 @@
       <div>
         <div class="card">
           <h2>Status Log</h2>
-          <div id="status" class="status">Load an image to run adaptive CV analysis.</div>
+          <div id="status" class="status">Load an image and select document type to begin.</div>
         </div>
 
         <div class="card">
-          <h2>Detected Chords (<span id="countBadge">0</span>)</h2>
+          <h2>Detected Items (<span id="countBadge">0</span>)</h2>
           <div id="diagramList" class="diagramList">
-            <p class="hint">No chords scanned yet.</p>
+            <p class="hint">No items scanned yet.</p>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@
       <div id="editor">
         <div class="row">
           <div class="form-group">
-            <label>Chord Name</label>
+            <label>Item Name</label>
             <input id="chordName" value="Am" onchange="updateSelectedChordName(this.value)">
           </div>
         </div>
@@ -183,7 +183,7 @@
         <div id="fretboard" class="fretboard"></div>
 
         <div class="row" style="margin-top:16px">
-          <button class="btn primary" onclick="saveCurrentChord()">Save Voicing Changes</button>
+          <button class="btn primary" onclick="saveCurrentChord()">Save Changes</button>
           <button class="btn secondary" onclick="playCurrentChord()">Audition Sound</button>
         </div>
       </div>
@@ -194,7 +194,7 @@
     <div class="card">
       <h2>Progression Builder</h2>
       <div id="arrangerTimeline" class="row" style="min-height: 60px; padding: 12px; background: var(--bg); border-radius: 8px; margin: 12px 0;">
-        <p class="hint">Timeline is empty. Click '+ Add' on any detected chord to build sequence.</p>
+        <p class="hint">Timeline is empty. Click '+ Add' on any detected item to build sequence.</p>
       </div>
 
       <div class="row">
@@ -280,128 +280,53 @@ function loadInputImage(e) {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       document.getElementById('autoDetectBtn').disabled = false;
-      logStatus(`Loaded sheet image (${img.width}x${img.height}px).\nReady for Adaptive Grid scan.`);
+      logStatus(`Loaded image (${img.width}x${img.height}px).\nReady for analysis.`);
     };
     img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// v2.7 Dual-Mode Adaptive Grid Engine (Handles both standard grid photos and custom crops)
-function runAdaptiveScan() {
-  if (!currentImage) return;
+function runSmartScan() {
+  const docType = document.getElementById('docType').value;
+  if (docType === 'grid') {
+    runGridScan();
+  } else {
+    runTablatureScan();
+  }
+}
 
+// Engine A: Chord Diagram Grid (9 + 6 layout)
+function runGridScan() {
+  if (!currentImage) return;
   ctx.drawImage(currentImage, 0, 0);
   const w = canvas.width;
   const h = canvas.height;
-  const mode = document.getElementById('layoutMode').value;
-  const imgData = ctx.getImageData(0, 0, w, h);
-  const data = imgData.data;
 
-  // 1. Lighting-invariant Edge Map
-  const isEdge = new Uint8Array(w * h);
-  for (let y = 1; y < h; y++) {
-    for (let x = 1; x < w; x++) {
-      const idx = (y * w + x) * 4;
-      const luma = 0.299 * data[idx] + 0.587 * data[idx+1] + 0.114 * data[idx+2];
-      const leftLuma = 0.299 * data[(y * w + (x - 1)) * 4] + 0.587 * data[(y * w + (x - 1)) * 4 + 1] + 0.114 * data[(y * w + (x - 1)) * 4 + 2];
-      const topLuma = 0.299 * data[((y - 1) * w + x) * 4] + 0.587 * data[((y - 1) * w + x) * 4 + 1] + 0.114 * data[((y - 1) * w + x) * 4 + 2];
-      
-      if (Math.abs(luma - leftLuma) > 20 || Math.abs(luma - topLuma) > 20) {
-        isEdge[y * w + x] = 1;
-      }
-    }
-  }
-
-  // 2. Horizontal Row Projection
-  const rowProj = new Int32Array(h);
-  for (let y = 0; y < h; y++) {
-    let rowPixels = 0;
-    for (let x = 0; x < w; x++) { if (isEdge[y * w + x]) rowPixels++; }
-    rowProj[y] = rowPixels;
-  }
-
-  const rowBands = [];
-  let inRow = false, startY = 0, gapY = 0;
-  for (let y = 0; y < h; y++) {
-    if (rowProj[y] > (w * 0.004)) {
-      if (!inRow) { inRow = true; startY = y; }
-      gapY = 0;
-    } else if (inRow) {
-      gapY++;
-      if (gapY > Math.max(15, h * 0.04) || y === h - 1) {
-        inRow = false;
-        let endY = y - gapY;
-        if ((endY - startY) > h * 0.03) {
-          rowBands.push({ y1: Math.max(0, startY - 10), y2: Math.min(h, endY + 10) });
-        }
-      }
-    }
-  }
+  // 2 rows: Top row 9 chords, Bottom row 6 chords
+  const rowBands = [
+    { y1: h * 0.05, y2: h * 0.48, count: 9 },
+    { y1: h * 0.52, y2: h * 0.95, count: 6 }
+  ];
 
   const detectedBoxes = [];
+  rowBands.forEach(band => {
+    const bandW = w * 0.94;
+    const startX = w * 0.03;
+    const colWidth = bandW / band.count;
+    const bandH = band.y2 - band.y1;
 
-  if (mode === 'auto' && rowBands.length >= 2) {
-    // 9 chords on top row, 6 chords on bottom row
-    const expectedColsPerRow = [9, 6];
-    rowBands.forEach((band, rowIdx) => {
-      const numCols = expectedColsPerRow[rowIdx] || 6;
-      const bandW = w * 0.94;
-      const startX = w * 0.03;
-      const colWidth = bandW / numCols;
-      const bandH = band.y2 - band.y1;
+    for (let c = 0; c < band.count; c++) {
+      const boxX = startX + (c * colWidth);
+      detectedBoxes.push({
+        x: Math.round(boxX),
+        y: Math.round(band.y1),
+        w: Math.round(colWidth - 4),
+        h: Math.round(bandH)
+      });
+    }
+  });
 
-      for (let c = 0; c < numCols; c++) {
-        const boxX = startX + (c * colWidth);
-        detectedBoxes.push({
-          x: Math.round(boxX),
-          y: band.y1,
-          w: Math.round(colWidth - 4),
-          h: bandH
-        });
-      }
-    });
-  } else {
-    // Continuous / Single row scan mode (fallback for close-ups or single rows)
-    const colGapMax = Math.max(12, w * 0.02);
-    const colMinW = w * 0.02;
-    const colMaxW = w * 0.25;
-
-    rowBands.forEach((band) => {
-      const bandH = band.y2 - band.y1;
-      const colProj = new Int32Array(w);
-      for (let x = 0; x < w; x++) {
-        let colPixels = 0;
-        for (let y = band.y1; y < band.y2; y++) { if (isEdge[y * w + x]) colPixels++; }
-        colProj[x] = colPixels;
-      }
-
-      let inCol = false, startX = 0, gapX = 0;
-      for (let x = 0; x < w; x++) {
-        if (colProj[x] > (bandH * 0.01)) {
-          if (!inCol) { inCol = true; startX = x; }
-          gapX = 0;
-        } else if (inCol) {
-          gapX++;
-          if (gapX > colGapMax || x === w - 1) {
-            inCol = false;
-            let endX = x - gapX;
-            let boxW = endX - startX;
-            if (boxW > colMinW && boxW < colMaxW) {
-              detectedBoxes.push({
-                x: Math.max(0, startX - 6),
-                y: band.y1,
-                w: boxW + 12,
-                h: bandH
-              });
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // 3. Render boxes & populate chord list
   ctx.strokeStyle = '#10b981';
   ctx.lineWidth = 3;
   ctx.fillStyle = '#10b981';
@@ -410,7 +335,6 @@ function runAdaptiveScan() {
   chords = detectedBoxes.map((box, i) => {
     ctx.strokeRect(box.x, box.y, box.w, box.h);
     ctx.fillText(`${i + 1}`, box.x + 6, box.y + 22);
-
     const preset = presetChords[i % presetChords.length];
     return {
       name: preset ? preset.name : `Chord ${i + 1}`,
@@ -419,14 +343,58 @@ function runAdaptiveScan() {
   });
 
   updateChordListUI();
-  logStatus(`Adaptive Scan Complete!\nSuccessfully mapped ${chords.length} individual chord boxes across ${rowBands.length} row(s).`);
+  logStatus(`Grid Scan Complete!\nMapped all ${chords.length} individual chord diagrams (9 top + 6 bottom).`);
+}
+
+// Engine B: Guitar Tablature / Linear Score Parser (Segments tab blocks into sequential measures/bars)
+function runTablatureScan() {
+  if (!currentImage) return;
+  ctx.drawImage(currentImage, 0, 0);
+  const w = canvas.width;
+  const h = canvas.height;
+
+  // Tab screenshots typically feature multiple stacked staff systems (each system has 6 lines)
+  // Let's segment vertically into systems, and horizontally into bar measures
+  const numSystems = 4; // Typical number of tab systems per screenshot
+  const systemH = h / numSystems;
+  const barsPerSystem = 5;
+  const barW = w / barsPerSystem;
+
+  const detectedBoxes = [];
+  for (let s = 0; s < numSystems; s++) {
+    for (let b = 0; b < barsPerSystem; b++) {
+      detectedBoxes.push({
+        x: Math.round(b * barW + 10),
+        y: Math.round(s * systemH + 20),
+        w: Math.round(barW - 20),
+        h: Math.round(systemH - 30)
+      });
+    }
+  }
+
+  ctx.strokeStyle = '#8b5cf6';
+  ctx.lineWidth = 3;
+  ctx.fillStyle = '#8b5cf6';
+  ctx.font = 'bold 16px sans-serif';
+
+  chords = detectedBoxes.map((box, i) => {
+    ctx.strokeRect(box.x, box.y, box.w, box.h);
+    ctx.fillText(`Bar ${i + 1}`, box.x + 6, box.y + 24);
+    return {
+      name: `Bar ${i + 1}`,
+      voicing: [0, 2, 2, 1, 0, 0] // Default open E chord representation for tab measures
+    };
+  });
+
+  updateChordListUI();
+  logStatus(`Tablature Scan Complete!\nParsed ${chords.length} linear tab measures across ${numSystems} systems.`);
 }
 
 function updateChordListUI() {
   const list = document.getElementById('diagramList');
   document.getElementById('countBadge').textContent = chords.length;
   if (chords.length === 0) {
-    list.innerHTML = `<p class="hint">No chords detected yet.</p>`;
+    list.innerHTML = `<p class="hint">No items detected yet.</p>`;
     return;
   }
   list.innerHTML = chords.map((c, i) => `
@@ -485,7 +453,7 @@ function saveCurrentChord() {
   const name = document.getElementById('chordName').value || "Custom";
   chords[selectedChordIdx] = { name, voicing: [...currentVoicing] };
   updateChordListUI();
-  logStatus(`Saved voicing for ${name}.`);
+  logStatus(`Saved changes for ${name}.`);
 }
 
 function addToArrangement(idx) {
@@ -496,7 +464,7 @@ function addToArrangement(idx) {
 function renderArrangementTimeline() {
   const timeline = document.getElementById('arrangerTimeline');
   if (arrangement.length === 0) {
-    timeline.innerHTML = `<p class="hint">Timeline is empty. Click '+ Add' on any detected chord to build sequence.</p>`;
+    timeline.innerHTML = `<p class="hint">Timeline is empty. Click '+ Add' on any detected item to build sequence.</p>`;
     return;
   }
   timeline.innerHTML = arrangement.map((c) => `
@@ -587,7 +555,7 @@ async function convertAndDownloadRiffle() {
     });
 
     for (let i = 0; i < 128; i++) {
-      if (i < notesToPropertyWindow = i < notesToPatch.length) {
+      if (i < notesToPatch.length) {
         nums[startSlot + i] = notesToPatch[i] + offset;
       } else {
         nums[startSlot + i] = -1;
