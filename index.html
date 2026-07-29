@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ChordScan Studio v2.4 Pro - Gap-Tolerant CV</title>
+<title>ChordScan Studio v2.5 Pro - Edge-Gradient CV</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -109,8 +109,8 @@
 
 <header>
   <div>
-    <h1>ChordScan Studio v2.4 Pro</h1>
-    <p>Gap-Tolerant Dynamic Threshold Segmentation</p>
+    <h1>ChordScan Studio v2.5 Pro</h1>
+    <p>Lighting-Invariant Edge-Gradient CV</p>
   </div>
 </header>
 
@@ -133,7 +133,7 @@
           </div>
 
           <div class="row" style="margin-top:12px">
-            <button class="btn primary" id="autoDetectBtn" onclick="runMultiRowProjectionScan()" disabled>Auto-Detect All Chords</button>
+            <button class="btn primary" id="autoDetectBtn" onclick="runEdgeGradientScan()" disabled>Auto-Detect All Chords</button>
           </div>
 
           <div class="canvasWrap">
@@ -145,7 +145,7 @@
       <div>
         <div class="card">
           <h2>Status Log</h2>
-          <div id="status" class="status">Load an image to run dynamic gap-tolerant CV analysis.</div>
+          <div id="status" class="status">Load an image to run lighting-invariant CV analysis.</div>
         </div>
 
         <div class="card">
@@ -270,15 +270,15 @@ function loadInputImage(e) {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       document.getElementById('autoDetectBtn').disabled = false;
-      logStatus(`Loaded sheet image (${img.width}x${img.height}px).\nReady for gap-tolerant CV analysis.`);
+      logStatus(`Loaded sheet image (${img.width}x${img.height}px).\nReady for Edge-Gradient scan.`);
     };
     img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// v2.4 Dynamic Gap-Tolerant Scanning Algorithm
-function runMultiRowProjectionScan() {
+// v2.5 Edge-Gradient Segmentation (Immune to shadows & relaxed dimensional limits)
+function runEdgeGradientScan() {
   if (!currentImage) return;
 
   ctx.drawImage(currentImage, 0, 0);
@@ -287,37 +287,43 @@ function runMultiRowProjectionScan() {
   const imgData = ctx.getImageData(0, 0, w, h);
   const data = imgData.data;
 
-  // 1. Calculate Image-wide Luma to establish a Dynamic Threshold
-  const lumaData = new Float32Array(w * h);
-  let lumaSum = 0;
-  for (let i = 0; i < w * h; i++) {
-    lumaData[i] = 0.299 * data[i*4] + 0.587 * data[i*4+1] + 0.114 * data[i*4+2];
-    lumaSum += lumaData[i];
+  // 1. Create a lighting-invariant Edge Map
+  const isEdge = new Uint8Array(w * h);
+  for (let y = 1; y < h; y++) {
+    for (let x = 1; x < w; x++) {
+      const idx = (y * w + x) * 4;
+      const luma = 0.299 * data[idx] + 0.587 * data[idx+1] + 0.114 * data[idx+2];
+      
+      const leftIdx = (y * w + (x - 1)) * 4;
+      const leftLuma = 0.299 * data[leftIdx] + 0.587 * data[leftIdx+1] + 0.114 * data[leftIdx+2];
+      
+      const topIdx = ((y - 1) * w + x) * 4;
+      const topLuma = 0.299 * data[topIdx] + 0.587 * data[topIdx+1] + 0.114 * data[topIdx+2];
+      
+      // Mark as active pixel if there is a sharp contrast change
+      if (Math.abs(luma - leftLuma) > 20 || Math.abs(luma - topLuma) > 20) {
+        isEdge[y * w + x] = 1;
+      }
+    }
   }
-  const avgLuma = lumaSum / (w * h);
-  const isDarkBg = avgLuma < 128;
-  
-  // Set threshold aggressively relative to average so thin lines aren't missed
-  const thresh = isDarkBg ? Math.min(200, avgLuma + 25) : Math.max(55, avgLuma - 25);
 
-  // 2. Horizontal Projection (Y-axis density)
+  // 2. Horizontal Projection (Find rows of text/diagrams)
   const rowProj = new Int32Array(h);
   for (let y = 0; y < h; y++) {
     let rowPixels = 0;
     for (let x = 0; x < w; x++) {
-      if (isDarkBg ? lumaData[y*w + x] > thresh : lumaData[y*w + x] < thresh) rowPixels++;
+      if (isEdge[y * w + x]) rowPixels++;
     }
     rowProj[y] = rowPixels;
   }
 
-  // Segment Rows with vertical Gap Tolerance (to bridge Chord Text -> Diagram gap)
   const rowBands = [];
   let inRow = false, startY = 0, gapY = 0;
-  const rowGapMax = h * 0.05; // Tolerate vertical gaps up to 5% of image height
-  const rowMinPx = w * 0.005; 
+  const rowGapMax = Math.max(15, h * 0.05); // Bridge internal vertical gaps
+  const rowMinHeight = h * 0.025; // Drastically lowered to catch smaller bottom rows
 
   for (let y = 0; y < h; y++) {
-    if (rowProj[y] > rowMinPx) {
+    if (rowProj[y] > (w * 0.005)) { // Very lenient edge requirement
       if (!inRow) { inRow = true; startY = y; }
       gapY = 0;
     } else if (inRow) {
@@ -325,18 +331,18 @@ function runMultiRowProjectionScan() {
       if (gapY > rowGapMax || y === h - 1) {
         inRow = false;
         let endY = y - gapY;
-        if ((endY - startY) > h * 0.08) { // Valid row must be at least 8% of total height
-          rowBands.push({ y1: Math.max(0, startY - 10), y2: Math.min(h, endY + 10) });
+        if ((endY - startY) > rowMinHeight) {
+          rowBands.push({ y1: Math.max(0, startY - 5), y2: Math.min(h, endY + 5) });
         }
       }
     }
   }
 
-  // 3. Vertical Projection (X-axis) with Horizontal Gap Tolerance (to bridge Strings)
+  // 3. Vertical Projection within Rows (Find columns/individual diagrams)
   const detectedBoxes = [];
-  const colGapMax = Math.max(15, w * 0.02); // Tolerate empty space between strings (up to 2% width)
-  const colMinW = w * 0.03;                 // Minimum valid width of a diagram
-  const colMaxW = w * 0.30;                 // Maximum valid width (prevents merging whole rows)
+  const colGapMax = Math.max(10, w * 0.025); 
+  const colMinW = w * 0.02; // Drastically lowered to 2% to never drop narrow chords
+  const colMaxW = w * 0.35; 
 
   rowBands.forEach((band) => {
     const bandH = band.y2 - band.y1;
@@ -345,16 +351,15 @@ function runMultiRowProjectionScan() {
     for (let x = 0; x < w; x++) {
       let colPixels = 0;
       for (let y = band.y1; y < band.y2; y++) {
-        if (isDarkBg ? lumaData[y*w + x] > thresh : lumaData[y*w + x] < thresh) colPixels++;
+        if (isEdge[y * w + x]) colPixels++;
       }
       colProj[x] = colPixels;
     }
 
     let inCol = false, startX = 0, gapX = 0;
-    const colMinPx = bandH * 0.01; // Require very few vertical pixels to keep column active
 
     for (let x = 0; x < w; x++) {
-      if (colProj[x] > colMinPx) {
+      if (colProj[x] > (bandH * 0.01)) {
         if (!inCol) { inCol = true; startX = x; }
         gapX = 0;
       } else if (inCol) {
@@ -366,9 +371,9 @@ function runMultiRowProjectionScan() {
           
           if (boxW > colMinW && boxW < colMaxW) {
             detectedBoxes.push({
-              x: Math.max(0, startX - 10),
+              x: Math.max(0, startX - 8),
               y: band.y1,
-              w: boxW + 20,
+              w: boxW + 16,
               h: bandH
             });
           }
@@ -395,7 +400,7 @@ function runMultiRowProjectionScan() {
   });
 
   updateChordListUI();
-  logStatus(`CV Scan Complete!\nBridged internal gaps. Detected ${chords.length} chord diagrams across ${rowBands.length} row(s).`);
+  logStatus(`CV Scan Complete!\nDetected ${chords.length} chord diagrams across ${rowBands.length} row(s) using Edge mapping.`);
 }
 
 function updateChordListUI() {
