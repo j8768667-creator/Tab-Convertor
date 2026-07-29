@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>ChordScan Studio v2.6 Pro - Fixed Grid Splitter</title>
+<title>ChordScan Studio v2.7 Pro - Dual-Mode Adaptive Grid</title>
 <style>
   :root {
     --bg: #0f172a;
@@ -109,8 +109,8 @@
 
 <header>
   <div>
-    <h1>ChordScan Studio v2.6 Pro</h1>
-    <p>Forced Multi-Column Grid Segmentation</p>
+    <h1>ChordScan Studio v2.7 Pro</h1>
+    <p>Dual-Mode Adaptive Grid Engine</p>
   </div>
 </header>
 
@@ -133,7 +133,17 @@
           </div>
 
           <div class="row" style="margin-top:12px">
-            <button class="btn primary" id="autoDetectBtn" onclick="runGridSplitterScan()" disabled>Auto-Detect All Chords</button>
+            <div class="form-group" style="flex:1">
+              <label>Layout Style</label>
+              <select id="layoutMode">
+                <option value="auto">Auto-Detect Layout (9+6 Grid)</option>
+                <option value="single">Single Row / Continuous</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary" id="autoDetectBtn" onclick="runAdaptiveScan()" disabled>Auto-Detect All Chords</button>
           </div>
 
           <div class="canvasWrap">
@@ -145,7 +155,7 @@
       <div>
         <div class="card">
           <h2>Status Log</h2>
-          <div id="status" class="status">Load an image to run grid-split analysis.</div>
+          <div id="status" class="status">Load an image to run adaptive CV analysis.</div>
         </div>
 
         <div class="card">
@@ -270,24 +280,25 @@ function loadInputImage(e) {
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
       document.getElementById('autoDetectBtn').disabled = false;
-      logStatus(`Loaded sheet image (${img.width}x${img.height}px).\nReady for Grid Splitter scan.`);
+      logStatus(`Loaded sheet image (${img.width}x${img.height}px).\nReady for Adaptive Grid scan.`);
     };
     img.src = event.target.result;
   };
   reader.readAsDataURL(file);
 }
 
-// v2.6 Forced Grid Splitter (Guarantees exact 9 top + 6 bottom = 15 chord boxes)
-function runGridSplitterScan() {
+// v2.7 Dual-Mode Adaptive Grid Engine (Handles both standard grid photos and custom crops)
+function runAdaptiveScan() {
   if (!currentImage) return;
 
   ctx.drawImage(currentImage, 0, 0);
   const w = canvas.width;
   const h = canvas.height;
+  const mode = document.getElementById('layoutMode').value;
   const imgData = ctx.getImageData(0, 0, w, h);
   const data = imgData.data;
 
-  // 1. Edge map for row detection
+  // 1. Lighting-invariant Edge Map
   const isEdge = new Uint8Array(w * h);
   for (let y = 1; y < h; y++) {
     for (let x = 1; x < w; x++) {
@@ -302,7 +313,7 @@ function runGridSplitterScan() {
     }
   }
 
-  // 2. Horizontal Projection to locate the 2 main rows
+  // 2. Horizontal Row Projection
   const rowProj = new Int32Array(h);
   for (let y = 0; y < h; y++) {
     let rowPixels = 0;
@@ -328,29 +339,69 @@ function runGridSplitterScan() {
     }
   }
 
-  // 3. Forced Grid Column Slicing (Row 0 = 9 chords, Row 1 = 6 chords)
   const detectedBoxes = [];
-  const expectedColsPerRow = [9, 6];
 
-  rowBands.forEach((band, rowIdx) => {
-    const numCols = expectedColsPerRow[rowIdx] || 6;
-    const bandW = w * 0.94; // Margin offset
-    const startX = w * 0.03;
-    const colWidth = bandW / numCols;
-    const bandH = band.y2 - band.y1;
+  if (mode === 'auto' && rowBands.length >= 2) {
+    // 9 chords on top row, 6 chords on bottom row
+    const expectedColsPerRow = [9, 6];
+    rowBands.forEach((band, rowIdx) => {
+      const numCols = expectedColsPerRow[rowIdx] || 6;
+      const bandW = w * 0.94;
+      const startX = w * 0.03;
+      const colWidth = bandW / numCols;
+      const bandH = band.y2 - band.y1;
 
-    for (let c = 0; c < numCols; c++) {
-      const boxX = startX + (c * colWidth);
-      detectedBoxes.push({
-        x: Math.round(boxX),
-        y: band.y1,
-        w: Math.round(colWidth - 4),
-        h: bandH
-      });
-    }
-  });
+      for (let c = 0; c < numCols; c++) {
+        const boxX = startX + (c * colWidth);
+        detectedBoxes.push({
+          x: Math.round(boxX),
+          y: band.y1,
+          w: Math.round(colWidth - 4),
+          h: bandH
+        });
+      }
+    });
+  } else {
+    // Continuous / Single row scan mode (fallback for close-ups or single rows)
+    const colGapMax = Math.max(12, w * 0.02);
+    const colMinW = w * 0.02;
+    const colMaxW = w * 0.25;
 
-  // 4. Render boxes & populate chord list
+    rowBands.forEach((band) => {
+      const bandH = band.y2 - band.y1;
+      const colProj = new Int32Array(w);
+      for (let x = 0; x < w; x++) {
+        let colPixels = 0;
+        for (let y = band.y1; y < band.y2; y++) { if (isEdge[y * w + x]) colPixels++; }
+        colProj[x] = colPixels;
+      }
+
+      let inCol = false, startX = 0, gapX = 0;
+      for (let x = 0; x < w; x++) {
+        if (colProj[x] > (bandH * 0.01)) {
+          if (!inCol) { inCol = true; startX = x; }
+          gapX = 0;
+        } else if (inCol) {
+          gapX++;
+          if (gapX > colGapMax || x === w - 1) {
+            inCol = false;
+            let endX = x - gapX;
+            let boxW = endX - startX;
+            if (boxW > colMinW && boxW < colMaxW) {
+              detectedBoxes.push({
+                x: Math.max(0, startX - 6),
+                y: band.y1,
+                w: boxW + 12,
+                h: bandH
+              });
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // 3. Render boxes & populate chord list
   ctx.strokeStyle = '#10b981';
   ctx.lineWidth = 3;
   ctx.fillStyle = '#10b981';
@@ -368,7 +419,7 @@ function runGridSplitterScan() {
   });
 
   updateChordListUI();
-  logStatus(`Grid Split Complete!\nSuccessfully mapped all ${chords.length} individual chord boxes (${rowBands.length} rows split cleanly).`);
+  logStatus(`Adaptive Scan Complete!\nSuccessfully mapped ${chords.length} individual chord boxes across ${rowBands.length} row(s).`);
 }
 
 function updateChordListUI() {
@@ -536,7 +587,7 @@ async function convertAndDownloadRiffle() {
     });
 
     for (let i = 0; i < 128; i++) {
-      if (i < notesToPatch.length) {
+      if (i < notesToPropertyWindow = i < notesToPatch.length) {
         nums[startSlot + i] = notesToPatch[i] + offset;
       } else {
         nums[startSlot + i] = -1;
